@@ -1,9 +1,9 @@
 FROM golang:stretch
 
-RUN git clone https://github.com/linuxkit/linuxkit /linuxkit
+RUN go get -u github.com/moby/tool/cmd/moby
+
+RUN go get -u github.com/linuxkit/linuxkit/src/cmd/linuxkit
 
 WORKDIR /linuxkit
-
-RUN make && make install
 
 CMD ["/bin/bash"]
