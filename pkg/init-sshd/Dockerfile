@@ -18,4 +18,6 @@ COPY --from=mirror /out/ /
 COPY etc/ /etc/
 RUN mkdir -p /etc/ssh /root/.ssh && chmod 0700 /root/.ssh
 RUN ssh-keygen -A >/dev/null 2>/dev/null
+# Remove Openrc inittab
+RUN rm /etc/inittab
 
