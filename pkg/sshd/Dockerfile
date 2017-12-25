@@ -12,10 +12,10 @@ RUN mv /out/etc/apk/repositories.upstream /out/etc/apk/repositories
 
 
 FROM scratch
-#ENTRYPOINT []
-ENTRYPOINT ["/bin/sh", "-c", "sleep 10000"]
+ENTRYPOINT []
 WORKDIR /
 COPY --from=mirror /out/ /
 COPY etc/ /etc/
 RUN mkdir -p /etc/ssh /root/.ssh && chmod 0700 /root/.ssh
+RUN ssh-keygen -A >/dev/null 2>/dev/null
 
