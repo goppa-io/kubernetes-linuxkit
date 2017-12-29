@@ -7,8 +7,18 @@ RUN apk add --no-cache --initdb -p /out \
     busybox \
     musl \
     openssh-server \
-    util-linux 
+    util-linux \
+    # Install Docker Packages
+    btrfs-progs \
+    e2fsprogs \
+    e2fsprogs-extra \
+    iptables \
+    xfsprogs \
+    xz
 RUN mv /out/etc/apk/repositories.upstream /out/etc/apk/repositories
+
+#Add Docker Users
+RUN  addgroup docker
 
 
 FROM scratch
