@@ -6,7 +6,7 @@ init:
   - linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
   - linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
-  - iidlx/sshd:7af875d3261e0971d9738374af2b049ab1f6df52
+  - iidlx/sshd:e0debea1481467004951f678e37ea92bd6b70435
 onboot:
   - name: sysctl
     image: linuxkit/sysctl:ce3bde5118a41092f1b7048c85d14fb35237ed45
@@ -61,6 +61,9 @@ files:
     optional: true
   - path: etc/linuxkit-config
     metadata: yaml
+  - path: etc/docker/dockerd
+    source: ~/docker/dockerd
+    mode: "0777"
 trust:
   org:
     - linuxkit
