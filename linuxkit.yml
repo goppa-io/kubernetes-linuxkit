@@ -13,6 +13,12 @@ onboot:
   - name: dhcpcd
     image: linuxkit/dhcpcd:0d59a6cc03412289ef4313f2491ec666c1715cc9
     command: ["/sbin/dhcpcd", "--nobackground", "-f", "/dhcpcd.conf", "-1"]
+  - name: format
+    image: linuxkit/format:e945016ec780a788a71dcddc81497d54d3b14bc7-amd64
+    command: ["/usr/bin/format", "-type", "ext4", "-label", "DATA", "/dev/sdb"]
+  - name: mount
+    image: linuxkit/mount:b346ec277b7074e5c9986128a879c10a1d18742b-amd64
+    command: ["/usr/bin/mountie", "-device", "/dev/sdb1", "/var/docker" ]
 onshutdown:
   - name: shutdown
     image: busybox:latest
@@ -35,6 +41,8 @@ services:
     binds:
      - /etc/resolv.conf:/etc/resolv.conf
 files:
+  #- path: var/docker
+  #  directory: true
   - path: etc/containerd/config.toml
     contents: |
       state = "/run/containerd"
@@ -61,9 +69,11 @@ files:
     optional: true
   - path: etc/linuxkit-config
     metadata: yaml
-  - path: etc/docker/dockerd
+  - path: usr/bin/dockerd
     source: ~/docker/dockerd
     mode: "0777"
+  - path: /etc/docker
+    symlink: "/var/docker"
 trust:
   org:
     - linuxkit
