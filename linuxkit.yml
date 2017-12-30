@@ -6,7 +6,7 @@ init:
   - linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
   - linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
-  - iidlx/sshd:e0debea1481467004951f678e37ea92bd6b70435
+  - iidlx/sshd:e0debea1481467004951f678e37ea92bd6b70435-dirty
 onboot:
   - name: sysctl
     image: linuxkit/sysctl:ce3bde5118a41092f1b7048c85d14fb35237ed45
@@ -41,8 +41,6 @@ services:
     binds:
      - /etc/resolv.conf:/etc/resolv.conf
 files:
-  #- path: var/docker
-  #  directory: true
   - path: etc/containerd/config.toml
     contents: |
       state = "/run/containerd"
@@ -72,6 +70,18 @@ files:
   - path: usr/bin/dockerd
     source: ~/docker/dockerd
     mode: "0777"
+  - path: usr/bin/docker
+    source: ~/docker/docker
+    mode: "0777"
+  #- path: usr/bin/docker-runc
+  #  source: ~/docker/docker-runc
+  #  mode: "0777"
+  - path: usr/bin/docker-init
+    source: ~/docker/docker-init
+    mode: "0777"
+  #- path: usr/bin/docker-containerd
+  #  source: ~/docker/docker-containerd
+  #  mode: "0777"
   - path: /etc/docker
     symlink: "/var/docker"
 trust:
