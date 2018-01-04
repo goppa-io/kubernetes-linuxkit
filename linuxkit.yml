@@ -64,6 +64,9 @@ files:
     mode: "0777"
   - path: /etc/docker
     symlink: "/var/docker"
+  - path: /etc/init.d/docker-init.sh
+    source: ~/debian-kubernetes/docker-init.sh
+    mode: "0777"
 trust:
   org:
     - linuxkit
