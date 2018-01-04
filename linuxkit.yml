@@ -26,23 +26,6 @@ onshutdown:
   - name: shutdown
     image: busybox:latest
     command: ["/bin/echo", "so long and thanks for all the fish"]
-services:
-  - name: getty
-    image: linuxkit/getty:22e27189b6b354e1d5d38fc0536a5af3f2adb79f
-    env:
-     - INSECURE=true
-  - name: rngd
-    image: linuxkit/rngd:94e01a4b16fadb053455cdc2269c4eb0b39199cd
-  - name: nginx
-    image: nginx:alpine
-    capabilities:
-     - CAP_NET_BIND_SERVICE
-     - CAP_CHOWN
-     - CAP_SETUID
-     - CAP_SETGID
-     - CAP_DAC_OVERRIDE
-    binds:
-     - /etc/resolv.conf:/etc/resolv.conf
 files:
   - path: etc/containerd/config.toml
     contents: |
@@ -76,15 +59,9 @@ files:
   - path: usr/bin/docker
     source: ~/docker/docker
     mode: "0777"
-  #- path: usr/bin/docker-runc
-  #  source: ~/docker/docker-runc
-  #  mode: "0777"
   - path: usr/bin/docker-init
     source: ~/docker/docker-init
     mode: "0777"
-  #- path: usr/bin/docker-containerd
-  #  source: ~/docker/docker-containerd
-  #  mode: "0777"
   - path: /etc/docker
     symlink: "/var/docker"
 trust:
