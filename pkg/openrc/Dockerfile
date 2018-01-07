@@ -13,6 +13,3 @@ FROM scratch
 ENTRYPOINT []
 WORKDIR /
 COPY --from=mirror /out/ /
-# Remove Openrc inittab
-RUN rm /etc/inittab
-
