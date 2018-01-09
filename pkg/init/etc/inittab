@@ -1,8 +1,12 @@
 # /etc/inittab
 
 ::sysinit:/etc/init.d/rcS
-::once:/etc/init.d/containerd
-::once:/etc/init.d/containers
+#::once:/etc/init.d/containerd
+#::once:/etc/init.d/containers
+
+::sysinit:/sbin/openrc sysinit
+::sysinit:/sbin/openrc boot
+::wait:/sbin/openrc default
 
 # Stuff to do for the 3-finger salute
 ::ctrlaltdel:/sbin/reboot
@@ -13,14 +17,6 @@
 ::shutdown:/usr/sbin/killall5 -9
 ::shutdown:/bin/echo "Unmounting filesystems"
 ::shutdown:/bin/umount -a -r
-
-# Set up a couple of getty's
-tty1::respawn:/sbin/getty 38400 tty1
-tty2::respawn:/sbin/getty 38400 tty2
-tty3::respawn:/sbin/getty 38400 tty3
-tty4::respawn:/sbin/getty 38400 tty4
-tty5::respawn:/sbin/getty 38400 tty5
-tty6::respawn:/sbin/getty 38400 tty6
 
 # Put a getty on the serial port
 ttyS0::respawn:/sbin/agetty -a root -L ttyS0 115200 vt100
