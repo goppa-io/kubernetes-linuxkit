@@ -16,6 +16,15 @@ onboot:
 files:
   - path: etc/docker/daemon.json
     contents: '{"debug": true}'
+  #- path: rc.conf
+  #  source: rc.conf
+  #  mode: "0600"
+  - path: etc/runlevels/boot/sysfs
+    symlink: "/etc/init.d/sysfs"
+  - path: etc/runlevels/boot/devfs
+    symlink: "/etc/init.d/devfs"
+  - path: etc/runlevels/boot/procfs
+    symlink: "/etc/init.d/procfs"
 trust:
   org:
     - linuxkit
