@@ -1,9 +1,14 @@
-#!/bin/sh
+#!/sbin/openrc-run
 
-# bring up containerd
-ulimit -n 1048576
-ulimit -p unlimited
+supervisor=supervise-daemon
+command=/usr/bin/containerd
+command_background="yes"
+pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+name=$RC_SVCNAME
+description="Containerd"
 
-printf "\nStarting containerd\n"
-mkdir -p /var/log
-exec /usr/bin/containerd
+start_pre()
+{
+    # Ensure Service DIR exits
+    mkdir -p /run/$RC_SVCNAME/
+}

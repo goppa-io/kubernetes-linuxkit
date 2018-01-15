@@ -76,16 +76,16 @@ done
 mdev -s
 
 # set hostname
-if [ -s /etc/hostname ]
-then
-	hostname -F /etc/hostname
-fi
+#if [ -s /etc/hostname ]
+#then
+#	hostname -F /etc/hostname
+#fi
 
-if [ $(hostname) = "(none)" -a -f /sys/class/net/eth0/address ]
-then
-	mac=$(cat /sys/class/net/eth0/address)
-	hostname linuxkit-$(echo $mac | sed 's/://g')
-fi
+#if [ $(hostname) = "(none)" -a -f /sys/class/net/eth0/address ]
+#then
+#	mac=$(cat /sys/class/net/eth0/address)
+#	hostname linuxkit-$(echo $mac | sed 's/://g')
+#fi
 
 # set system clock from hwclock
 hwclock --hctosys --utc

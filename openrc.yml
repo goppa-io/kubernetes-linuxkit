@@ -25,6 +25,10 @@ files:
     symlink: "/etc/init.d/devfs"
   - path: etc/runlevels/boot/procfs
     symlink: "/etc/init.d/procfs"
+  - path: etc/runlevels/boot/hostname
+    symlink: "/etc/init.d/hostname"
+  - path: etc/runlevels/default/containerd
+    symlink: "/etc/init.d/hostname"
 trust:
   org:
     - linuxkit
