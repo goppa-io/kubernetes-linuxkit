@@ -2,23 +2,13 @@ kernel:
   image: linuxkit/kernel:4.9.75
   cmdline: "console=ttyS0 console=tty0 page_poison=1"
 init:
-  - init:image # with runc, logwrite, startmemlogd
+  - init:image
   - linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
   - linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
-  - linuxkit/memlogd:9b5834189f598f43c507f6938077113906f51012
-onboot:
-  - name: sysctl
-    image: linuxkit/sysctl:4c1ef93bb5eb1a877318db4b2daa6768ed002e21
-  - name: dhcpcd
-    image: linuxkit/dhcpcd:0d59a6cc03412289ef4313f2491ec666c1715cc9
-    command: ["/sbin/dhcpcd", "--nobackground", "-f", "/dhcpcd.conf", "-1"]
 files:
   - path: etc/docker/daemon.json
     contents: '{"debug": true}'
-  #- path: rc.conf
-  #  source: rc.conf
-  #  mode: "0600"
   - path: etc/runlevels/boot/sysfs
     symlink: "/etc/init.d/sysfs"
   - path: etc/runlevels/boot/devfs
