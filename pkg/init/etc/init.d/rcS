@@ -99,6 +99,8 @@ hwclock --hctosys --utc
 #mkdir /tmp/etc
 #mv /etc/resolv.conf /tmp/etc/resolv.conf
 #ln -snf /tmp/etc/resolv.conf /etc/resolv.conf
+rm /etc/resolv.conf
+touch /etc/resolv.conf
 
 # remount rootfs as readonly
 #mount -o remount,ro /
