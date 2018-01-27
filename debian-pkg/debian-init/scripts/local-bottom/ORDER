@@ -1,0 +1,2 @@
+/scripts/local-bottom/growroot "$@"
+[ -e /conf/param.conf ] && . /conf/param.conf
