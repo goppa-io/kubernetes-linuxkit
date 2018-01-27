@@ -1,11 +1,14 @@
 kernel:
-  image: linuxkit/kernel:4.9.75
-  cmdline: "console=ttyS0 console=tty0 page_poison=1"
+  image: linuxkit/kernel:4.9.78
+  cmdline: "console=ttyS1 ds=nocloud;s=/meta-data"
+  #ucode: intel-ucode.cpio
 init:
   - init:image
   - linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
   - linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
+  - linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
+  - iidlx/cloud-init:4887af3e0bc4bfc6c04b0d313ceee7ba1c53ddfe
 files:
   - path: etc/docker/daemon.json
     contents: '{"debug": true}'
@@ -19,6 +22,14 @@ files:
     symlink: "/etc/init.d/hostname"
   - path: etc/runlevels/default/containerd
     symlink: "/etc/init.d/hostname"
+  - path: etc/runlevels/boot/networking
+    symlink: "/etc/init.d/networking"
+  - path: /etc/modules-load.d/packet.conf
+    source: packet.conf
+  #- path: etc/network/interfaces
+  #  contents: |
+  #    auto eth0
+  #    iface eth0 inet dhcp
 trust:
   org:
     - linuxkit
