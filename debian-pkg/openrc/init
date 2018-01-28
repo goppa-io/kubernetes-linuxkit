@@ -41,9 +41,35 @@ for opt in $(cat /proc/cmdline); do
 		setup_console ${opt#console=} /mnt/etc/inittab /mnt/etc/securetty;;
 	esac
 done
+##################
+# mount devfs
+mount -n -t devtmpfs dev /dev -o nosuid,noexec,relatime,size=10m,nr_inodes=248418,mode=755
+# devices
+[ -c /dev/console ] || mknod -m 600 /dev/console c 5 1
+[ -c /dev/tty1 ] || mknod -m 620 /dev/tty1 c 4 1
+[ -c /dev/tty ] || mknod -m 666 /dev/tty c 5 0
 
-exec /usr/lib/klibc/bin/run-init /mnt /sbin/openrc-init 
-#"$@" </mnt/dev/console >/mnt/dev/console 2>&1
+[ -c /dev/null ] || mknod -m 666 /dev/null c 1 3
+[ -c /dev/kmsg ] || mknod -m 660 /dev/kmsg c 1 11
+
+# extra symbolic links not provided by default
+[ -e /dev/fd ] || ln -snf /proc/self/fd /dev/fd
+[ -e /dev/stdin ] || ln -snf /proc/self/fd/0 /dev/stdin
+[ -e /dev/stdout ] || ln -snf /proc/self/fd/1 /dev/stdout
+[ -e /dev/stderr ] || ln -snf /proc/self/fd/2 /dev/stderr
+[ -e /proc/kcore ] && ln -snf /proc/kcore /dev/core
+
+# devfs filesystems
+mkdir -p -m 1777 /dev/mqueue
+mkdir -p -m 1777 /dev/shm
+mkdir -p -m 0755 /dev/pts
+mount -n -t mqueue -o noexec,nosuid,nodev mqueue /dev/mqueue
+mount -n -t tmpfs -o noexec,nosuid,nodev,mode=1777 shm /dev/shm
+mount -n -t devpts -o noexec,nosuid,gid=5,mode=0620 devpts /dev/pts
+###############################################################
+
+#exec /usr/lib/klibc/bin/run-init /mnt /bin/bash "$@" </mnt/dev/console >/mnt/dev/console 2>&1
+exec /bin/bash "$@" </mnt/dev/console >/mnt/dev/console 2>&1
 echo "Something went badly wrong in the initramfs."
 panic "Please file a bug on initramfs-tools."
 

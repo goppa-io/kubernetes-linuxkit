@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # mount filesystems
-#mount -n -t proc proc /proc -o nodev,nosuid,noexec,relatime
+mount -n -t proc proc /proc -o nodev,nosuid,noexec,relatime
 
-#mount -n -t tmpfs tmpfs /run -o nodev,nosuid,noexec,relatime,size=10%,mode=755
-#mount -n -t tmpfs tmpfs /tmp -o nodev,nosuid,noexec,relatime,size=10%,mode=1777
+mount -n -t tmpfs tmpfs /run -o nodev,nosuid,noexec,relatime,size=10%,mode=755
+mount -n -t tmpfs tmpfs /tmp -o nodev,nosuid,noexec,relatime,size=10%,mode=1777
 
 # mount devfs
-#mount -n -t devtmpfs dev /dev -o nosuid,noexec,relatime,size=10m,nr_inodes=248418,mode=755
+mount -n -t devtmpfs dev /dev -o nosuid,noexec,relatime,size=10m,nr_inodes=248418,mode=755
 # devices
 [ -c /dev/console ] || mknod -m 600 /dev/console c 5 1
 [ -c /dev/tty1 ] || mknod -m 620 /dev/tty1 c 4 1
@@ -24,26 +24,26 @@
 [ -e /proc/kcore ] && ln -snf /proc/kcore /dev/core
 
 # devfs filesystems
-#mkdir -p -m 1777 /dev/mqueue
-#mkdir -p -m 1777 /dev/shm
-#mkdir -p -m 0755 /dev/pts
-#mount -n -t mqueue -o noexec,nosuid,nodev mqueue /dev/mqueue
-#mount -n -t tmpfs -o noexec,nosuid,nodev,mode=1777 shm /dev/shm
-#mount -n -t devpts -o noexec,nosuid,gid=5,mode=0620 devpts /dev/pts
+mkdir -p -m 1777 /dev/mqueue
+mkdir -p -m 1777 /dev/shm
+mkdir -p -m 0755 /dev/pts
+mount -n -t mqueue -o noexec,nosuid,nodev mqueue /dev/mqueue
+mount -n -t tmpfs -o noexec,nosuid,nodev,mode=1777 shm /dev/shm
+mount -n -t devpts -o noexec,nosuid,gid=5,mode=0620 devpts /dev/pts
 
 # mount sysfs
-#sysfs_opts=nodev,noexec,nosuid
-#mount -n -t sysfs -o ${sysfs_opts} sysfs /sys
-#[ -d /sys/kernel/security ] && mount -n -t securityfs -o ${sysfs_opts} securityfs /sys/kernel/security
-#[ -d /sys/kernel/debug ] && mount -n -t debugfs -o ${sysfs_opts} debugfs /sys/kernel/debug
-#[ -d /sys/kernel/config ] && mount -n -t configfs -o ${sysfs_opts} configfs /sys/kernel/config
-#[ -d /sys/fs/fuse/connections ] && mount -n -t fusectl -o ${sysfs_opts} fusectl /sys/fs/fuse/connections
-#[ -d /sys/fs/selinux ] && mount -n -t selinuxfs -o nosuid,noexec selinuxfs /sys/fs/selinux
-#[ -d /sys/fs/pstore ] && mount -n -t pstore pstore -o ${sysfs_opts} /sys/fs/pstore
-#[ -d /sys/firmware/efi/efivars ] && mount -n -t efivarfs -o ro,${sysfs_opts} efivarfs /sys/firmware/efi/efivars
+sysfs_opts=nodev,noexec,nosuid
+mount -n -t sysfs -o ${sysfs_opts} sysfs /sys
+[ -d /sys/kernel/security ] && mount -n -t securityfs -o ${sysfs_opts} securityfs /sys/kernel/security
+[ -d /sys/kernel/debug ] && mount -n -t debugfs -o ${sysfs_opts} debugfs /sys/kernel/debug
+[ -d /sys/kernel/config ] && mount -n -t configfs -o ${sysfs_opts} configfs /sys/kernel/config
+[ -d /sys/fs/fuse/connections ] && mount -n -t fusectl -o ${sysfs_opts} fusectl /sys/fs/fuse/connections
+[ -d /sys/fs/selinux ] && mount -n -t selinuxfs -o nosuid,noexec selinuxfs /sys/fs/selinux
+[ -d /sys/fs/pstore ] && mount -n -t pstore pstore -o ${sysfs_opts} /sys/fs/pstore
+[ -d /sys/firmware/efi/efivars ] && mount -n -t efivarfs -o ro,${sysfs_opts} efivarfs /sys/firmware/efi/efivars
 
 # misc /proc mounted fs
-#[ -d /proc/sys/fs/binfmt_misc ] && mount -t binfmt_misc -o nodev,noexec,nosuid binfmt_misc /proc/sys/fs/binfmt_misc
+[ -d /proc/sys/fs/binfmt_misc ] && mount -t binfmt_misc -o nodev,noexec,nosuid binfmt_misc /proc/sys/fs/binfmt_misc
 
 # mount cgroups
 mount -n -t tmpfs -o nodev,noexec,nosuid,mode=755,size=10m cgroup_root /sys/fs/cgroup
@@ -76,39 +76,37 @@ done
 mdev -s
 
 # set hostname
-#if [ -s /etc/hostname ]
-#then
-#	hostname -F /etc/hostname
-#fi
+if [ -s /etc/hostname ]
+then
+	hostname -F /etc/hostname
+fi
 
-#if [ $(hostname) = "(none)" -a -f /sys/class/net/eth0/address ]
-#then
-#	mac=$(cat /sys/class/net/eth0/address)
-#	hostname linuxkit-$(echo $mac | sed 's/://g')
-#fi
+if [ $(hostname) = "(none)" -a -f /sys/class/net/eth0/address ]
+then
+	mac=$(cat /sys/class/net/eth0/address)
+	hostname linuxkit-$(echo $mac | sed 's/://g')
+fi
 
 # set system clock from hwclock
 hwclock --hctosys --utc
 
 # bring up loopback interface
-#ip addr add 127.0.0.1/8 dev lo brd + scope host
-#ip route add 127.0.0.0/8 dev lo scope host
-#ip link set lo up
+ip addr add 127.0.0.1/8 dev lo brd + scope host
+ip route add 127.0.0.0/8 dev lo scope host
+ip link set lo up
 
 # for containerising dhcpcd and other containers that need writable etc
-#mkdir /tmp/etc
-#mv /etc/resolv.conf /tmp/etc/resolv.conf
-#ln -snf /tmp/etc/resolv.conf /etc/resolv.conf
-rm /etc/resolv.conf
-touch /etc/resolv.conf
+mkdir /tmp/etc
+mv /etc/resolv.conf /tmp/etc/resolv.conf
+ln -snf /tmp/etc/resolv.conf /etc/resolv.conf
 
 # remount rootfs as readonly
-#mount -o remount,ro /
+mount -o remount,ro /
 
 # make /var writeable and shared
-#mount -o bind /var /var
-#mount -o remount,rw,nodev,nosuid,noexec,relatime /var /var
-#mount --make-rshared /var
+mount -o bind /var /var
+mount -o remount,rw,nodev,nosuid,noexec,relatime /var /var
+mount --make-rshared /var
 
 # make / rshared
-#mount --make-rshared /
+mount --make-rshared /

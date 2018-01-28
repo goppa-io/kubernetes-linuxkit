@@ -1,0 +1,39 @@
+kernel:
+  image: iidlx/kernel-debian:4.9.65-3
+  cmdline: "console=tty0 console=ttyS0"
+init:
+  - iidlx/openrc:963c6d01a24356e5d518f85a266fc1df7846cd8c-dirty
+  #- linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
+  #- linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
+  #- linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
+  #- linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
+  #- iidlx/cloud-init:4887af3e0bc4bfc6c04b0d313ceee7ba1c53ddfe
+files:
+  - path: etc/docker/daemon.json
+    contents: '{"debug": true}'
+  - path: etc/runlevels/boot/sysfs
+    symlink: "/etc/init.d/sysfs"
+  - path: etc/runlevels/boot/devfs
+    symlink: "/etc/init.d/devfs"
+  - path: etc/runlevels/boot/procfs
+    symlink: "/etc/init.d/procfs"
+  - path: etc/runlevels/boot/hostname
+    symlink: "/etc/init.d/hostname"
+  - path: etc/runlevels/default/containerd
+    symlink: "/etc/init.d/hostname"
+  - path: etc/runlevels/boot/networking
+    symlink: "/etc/init.d/networking"
+  - path: /etc/modules-load.d/packet.conf
+    source: packet.conf
+  - path: etc/runlevels/boot/agetty.ttyS1
+    symlink: "/etc/init.d/agetty.ttyS1"
+  - path: etc/runlevels/boot/agetty.tty1
+    symlink: "/etc/init.d/agetty.tty1"
+  #- path: etc/network/interfaces
+  #  contents: |
+  #    auto eth0
+  #    iface eth0 inet dhcp
+trust:
+  org:
+    - linuxkit
+    - library

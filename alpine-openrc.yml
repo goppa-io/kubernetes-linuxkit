@@ -1,6 +1,6 @@
 kernel:
-  image: linuxkit/kernel:4.9.78
-  cmdline: "console=ttyS1 ds=nocloud;s=/meta-data"
+  #image: linuxkit/kernel:4.9.78
+  cmdline: "console=tty0 console=ttyS0"
   #ucode: intel-ucode.cpio
 init:
   - init:image
