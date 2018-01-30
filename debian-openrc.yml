@@ -1,8 +1,9 @@
 kernel:
   image: iidlx/kernel-debian:4.9.65-3
-  cmdline: "console=tty0 console=ttyS0"
+  cmdline: "console=ttyS1"
 init:
-  - iidlx/openrc:963c6d01a24356e5d518f85a266fc1df7846cd8c-dirty
+  - iidlx/openrc:107220bcc4d947d8f28aa87c698afd56a8009e8b-dirty
+  - linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
   #- linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
   #- linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
   #- linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
@@ -19,20 +20,29 @@ files:
     symlink: "/etc/init.d/procfs"
   - path: etc/runlevels/boot/hostname
     symlink: "/etc/init.d/hostname"
-  - path: etc/runlevels/default/containerd
-    symlink: "/etc/init.d/hostname"
-  - path: etc/runlevels/boot/networking
+  #- path: etc/runlevels/default/containerd
+  #  symlink: "/etc/init.d/hostname"
+  - path: etc/runlevels/sysinit/networking
     symlink: "/etc/init.d/networking"
+  - path: etc/runlevels/sysinit/modules
+    symlink: "/etc/init.d/modules"
+  - path: etc/runlevels/sysinit/sshd
+    symlink: "/etc/init.d/sshd"
+  - path: ~/.ssh/authorized_keys
+    contents: |
+      ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCnxGbWpxBQoomQ4hD4eO5HnxM9olcoZbs70hMWHw/e5aErfyqp770GNdNe2HTWOV4pcJewCfo/F0I4xm5HIEVlEE4ml45nBMwiy9btHQ47nyXxrSln+WPpDdnv2/H154JQgrmDCrU3uj2sQGaLFGKsVZ08+XfefVC/uG056GQxco2mA/aASZ7eudPZ4lP6/Hw2O3Qz+dUW0QhYPfCUCfvb80AKpGRAwPoiWsB4AfVUKD1mXrkmVMs4LMT4GJAoIgxKcOxw5796m1YdUdsxAW62fUpO2+xUsjw7FD5HqfckqsNyijKWt9E0gZAtNDAIsOe/HGc7B9M31WK3Fy7FQjep root@twt084pc
   - path: /etc/modules-load.d/packet.conf
     source: packet.conf
+  - path: etc/runlevels/boot/agetty.ttyS0
+    symlink: "/etc/init.d/agetty.ttyS0"
+  - path: etc/runlevels/boot/agetty.tty0
+    symlink: "/etc/init.d/agetty.tty0"
   - path: etc/runlevels/boot/agetty.ttyS1
     symlink: "/etc/init.d/agetty.ttyS1"
-  - path: etc/runlevels/boot/agetty.tty1
-    symlink: "/etc/init.d/agetty.tty1"
-  #- path: etc/network/interfaces
-  #  contents: |
-  #    auto eth0
-  #    iface eth0 inet dhcp
+  - path: etc/network/interfaces
+    contents: |
+      auto eth0
+      iface eth0 inet dhcp
 trust:
   org:
     - linuxkit

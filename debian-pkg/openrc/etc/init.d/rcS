@@ -65,7 +65,7 @@ mkdir -p /sys/fs/cgroup/systemd
 mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
 
 # start mdev for hotplug
-echo "/sbin/mdev" > /proc/sys/kernel/hotplug
+echo "/bin/busybox mdev" > /proc/sys/kernel/hotplug
 
 # mdev -s will not create /dev/usb[1-9] devices with recent kernels
 # so we trigger hotplug events for usb for now
@@ -73,7 +73,7 @@ for i in $(find /sys/devices -name 'usb[0-9]*'); do
 	[ -e $i/uevent ] && echo add > $i/uevent
 done
 
-mdev -s
+/bin/busybox mdev -s
 
 # set hostname
 if [ -s /etc/hostname ]
@@ -101,7 +101,7 @@ mv /etc/resolv.conf /tmp/etc/resolv.conf
 ln -snf /tmp/etc/resolv.conf /etc/resolv.conf
 
 # remount rootfs as readonly
-mount -o remount,ro /
+#mount -o remount,ro /
 
 # make /var writeable and shared
 mount -o bind /var /var

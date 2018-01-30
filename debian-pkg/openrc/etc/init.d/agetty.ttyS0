@@ -13,8 +13,8 @@ description="start agetty on a terminal line"
 supervisor=supervise-daemon
 port="${RC_SVCNAME#*.}"
 term_type="${term_type:-linux}"
-command=/sbin/agetty -a root -L ttyS1 115200 vt100
-#command_args_foreground="${agetty_options} ${port} ${baud} ${termtype}"
+command=/sbin/agetty
+command_args_foreground="${agetty_options} ${port} ${baud} ${termtype}"
 pidfile="/run/${RC_SVCNAME}.pid"
 
 depend() {
