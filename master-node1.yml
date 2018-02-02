@@ -1,0 +1,60 @@
+kernel:
+  image: linuxkit/kernel:4.9.78
+  cmdline: "console=tty0 console=ttyS0 rootfstype=tmpfs"
+init:
+  - iidlx/openrc:2971a534dae5449786e2735f971941dfe7a07a4b
+  - linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
+  - linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
+  - iidlx/dockerd:e9bcfca8db2fb7615181295df7d02ad6386e1245
+  - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
+  - linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
+files:
+  - path: /init
+    symlink: "/bin/busybox"
+  - path: etc/runlevels/sysinit/sysfs
+    symlink: "/etc/init.d/sysfs"
+  - path: etc/runlevels/sysinit/devfs
+    symlink: "/etc/init.d/devfs"
+  - path: etc/runlevels/sysinit/procfs
+    symlink: "/etc/init.d/procfs"
+  - path: etc/runlevels/sysinit/mdev
+    symlink: "/etc/init.d/mdev"
+  - path: etc/runlevels/sysinit/hwclock
+    symlink: "/etc/init.d/hwclock"
+  - path: etc/runlevels/boot/hostname
+    symlink: "/etc/init.d/hostname"
+  - path: etc/runlevels/default/containerd
+    symlink: "/etc/init.d/hostname"
+  - path: etc/runlevels/boot/networking
+    symlink: "/etc/init.d/networking"
+  - path: etc/modules-load.d/packet.conf
+    source: packet.conf
+  - path: etc/network/interfaces
+    contents: |
+      auto eth0
+      iface eth0 inet dhcp
+  - path: etc/docker/daemon.json
+    contents: '{"debug": true}'
+  - path: etc/containerd/config.toml
+    contents: |
+      state = "/run/containerd"
+      root = "/var/lib/containerd"
+      snapshotter = "io.containerd.snapshotter.v1.overlayfs"
+      differ = "io.containerd.differ.v1.base-diff"
+      subreaper = false
+
+      [grpc]
+      address = "/run/containerd/containerd.sock"
+      uid = 0
+      gid = 0
+
+      [debug]
+      address = "/run/containerd/debug.sock"
+      level = "info"
+
+      [metrics]
+      address = ":13337"
+trust:
+  org:
+    - linuxkit
+    - library
