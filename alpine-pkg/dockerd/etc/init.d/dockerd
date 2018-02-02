@@ -1,8 +1,9 @@
 #!/sbin/openrc-run
 
 supervisor=supervise-daemon
-command=/usr/bin/dockerd --containerd /run/containerd/containerd.sock --default-runtime="oci" --add-runtime "oci=/usr/bin/runc"
+command=/usr/bin/dockerd
 command_background="yes"
+command_args_background="--containerd /run/containerd/containerd.sock --default-runtime='oci' --add-runtime 'oci=/usr/bin/runc'"
 pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
 name=$RC_SVCNAME
 description="Dockerd"
