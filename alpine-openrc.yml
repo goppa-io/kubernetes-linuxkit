@@ -1,6 +1,6 @@
 kernel:
   image: linuxkit/kernel:4.9.78
-  cmdline: "console=tty0 console=ttyS0"
+  cmdline: "console=tty0 console=ttyS0 rootfstype=tmpfs"
   #ucode: intel-ucode.cpio
 init:
   - init:image
@@ -29,6 +29,8 @@ files:
     contents: |
       auto eth0
       iface eth0 inet dhcp
+  - path: /init
+    symlink: "/bin/busybox"
 trust:
   org:
     - linuxkit
