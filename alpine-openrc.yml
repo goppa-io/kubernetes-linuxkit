@@ -3,7 +3,7 @@ kernel:
   cmdline: "console=tty0 console=ttyS0 rootfstype=tmpfs"
   #ucode: intel-ucode.cpio
 init:
-  - init:image
+  - idlx/openrc:5ea9fa9068ad1d23d776b500e8786e922c8ebcde
   - linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
   - linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
