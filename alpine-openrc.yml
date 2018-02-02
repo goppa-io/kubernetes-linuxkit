@@ -1,9 +1,8 @@
 kernel:
   image: linuxkit/kernel:4.9.78
   cmdline: "console=tty0 console=ttyS0 rootfstype=tmpfs"
-  #ucode: intel-ucode.cpio
 init:
-  - idlx/openrc:5ea9fa9068ad1d23d776b500e8786e922c8ebcde
+  - iidlx/openrc:2971a534dae5449786e2735f971941dfe7a07a4b
   - linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
   - linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
@@ -11,12 +10,16 @@ init:
 files:
   - path: etc/docker/daemon.json
     contents: '{"debug": true}'
-  - path: etc/runlevels/boot/sysfs
+  - path: etc/runlevels/sysinit/sysfs
     symlink: "/etc/init.d/sysfs"
-  - path: etc/runlevels/boot/devfs
+  - path: etc/runlevels/sysinit/devfs
     symlink: "/etc/init.d/devfs"
-  - path: etc/runlevels/boot/procfs
+  - path: etc/runlevels/sysinit/procfs
     symlink: "/etc/init.d/procfs"
+  - path: etc/runlevels/sysinit/mdev
+    symlink: "/etc/init.d/mdev"
+  - path: etc/runlevels/sysinit/hwclock
+    symlink: "/etc/init.d/hwclock"
   - path: etc/runlevels/boot/hostname
     symlink: "/etc/init.d/hostname"
   - path: etc/runlevels/default/containerd
