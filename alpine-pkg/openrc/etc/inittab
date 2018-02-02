@@ -1,9 +1,5 @@
 # /etc/inittab
 
-::sysinit:/etc/init.d/rcS
-#::once:/etc/init.d/containerd
-#::once:/etc/init.d/containers
-
 ::sysinit:/sbin/openrc sysinit
 ::sysinit:/sbin/openrc boot
 ::wait:/sbin/openrc default
