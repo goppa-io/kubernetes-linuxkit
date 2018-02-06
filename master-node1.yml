@@ -6,8 +6,13 @@ init:
   - linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
   - linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
   - iidlx/dockerd:e9bcfca8db2fb7615181295df7d02ad6386e1245
+  - iidlx/kubernetes:ffd8d6643dfd4db2b7cf4f085bf14d59951f5be8-dirty
+  - iidlx/etcd3:b0b95ed385a8fc63bb539f7f9031981c0c8d7ffa
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
   - linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
+onboot:
+  - name: redis
+    image: redis:4.0.5-alpine
 files:
   - path: /init
     symlink: "/bin/busybox"
@@ -24,7 +29,7 @@ files:
   - path: etc/runlevels/boot/hostname
     symlink: "/etc/init.d/hostname"
   - path: etc/runlevels/default/containerd
-    symlink: "/etc/init.d/hostname"
+    symlink: "/etc/init.d/containerd"
   - path: etc/runlevels/boot/networking
     symlink: "/etc/init.d/networking"
   - path: etc/modules-load.d/packet.conf
@@ -54,6 +59,46 @@ files:
 
       [metrics]
       address = ":13337"
+  - path: etc/init.d/kubelet
+    mode: "777"
+    contents: | 
+      #!/sbin/openrc-run
+
+      supervisor=supervise-daemon
+      command=/usr/bin/kubelet
+      command_args_foreground="--allow-privileged=true --cgroup-root=/ --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=kubenet --node-labels=kubernetes.io/role=master --non-masquerade-cidr=100.64.0.0/10 --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --register-schedulable=true --register-with-taints=node-role.kubernetes.io/master=:NoSchedule --require-kubeconfig=true --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/"
+      name=$RC_SVCNAME
+      description="Kubelet"
+
+      start_pre()
+      {
+          # Ensure Service DIR exits
+          mkdir -p /run/$RC_SVCNAME/
+      }
+  - path: var/lib/kubelet/kubeconfig
+    contents: |
+      apiVersion: v1
+      clusters:
+      - cluster:
+          certificate-authority: /etc/srv/kubernetes/pki/ca-certificates.crt 
+          server: https://127.0.0.1
+        name: local
+      contexts:
+      - context:
+          cluster: local
+          user: kubelet
+        name: service-account-context
+      current-context: service-account-context
+      kind: Config
+      users:
+      - name: kubelet
+        user:
+          client-certificate: /etc/srv/kubernetes/pki/apiserver.crt 
+          client-key: /etc/srv/kubernetes/pki/apiserver.key
+  - path: etc/runlevels/default/dockerd
+    symlink: "/etc/init.d/dockerd"
+  - path: etc/runlevels/default/kubelet
+    symlink: "/etc/init.d/kubelet"
 trust:
   org:
     - linuxkit
