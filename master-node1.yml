@@ -67,7 +67,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/kubelet
-      command_args="--allow-privileged=true --cgroup-root=/ --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=kubenet --node-labels=kubernetes.io/role=master --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --register-schedulable=true --register-with-taints=node-role.kubernetes.io/master=:NoSchedule --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/"
+      command_args="--allow-privileged=true --cgroup-root=/ --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=kubenet --node-labels=kubernetes.io/role=master --non-masquerade-cidr=100.64.0.0/10 --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --register-with-taints=node-role.kubernetes.io/master=:NoSchedule --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kubelet/${RC_SVCNAME}.log --stderr /var/log/kubelet/${RC_SVCNAME}.log"
      
