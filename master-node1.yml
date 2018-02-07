@@ -10,9 +10,6 @@ init:
   - iidlx/etcd3:b0b95ed385a8fc63bb539f7f9031981c0c8d7ffa
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
   - linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
-onboot:
-  - name: redis
-    image: redis:4.0.5-alpine
 files:
   - path: /init
     symlink: "/bin/busybox"
@@ -64,16 +61,27 @@ files:
     contents: | 
       #!/sbin/openrc-run
 
-      supervisor=supervise-daemon
-      command=/usr/bin/kubelet
-      command_args_foreground="--allow-privileged=true --cgroup-root=/ --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=kubenet --node-labels=kubernetes.io/role=master --non-masquerade-cidr=100.64.0.0/10 --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --register-schedulable=true --register-with-taints=node-role.kubernetes.io/master=:NoSchedule --require-kubeconfig=true --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/"
-      name=$RC_SVCNAME
       description="Kubelet"
+      pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+      name=$RC_SVCNAME
+      #supervisor=start-stop-daemon
+
+      command=/usr/bin/kubelet
+      command_args="--allow-privileged=true --cgroup-root=/ --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=kubenet --node-labels=kubernetes.io/role=master --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --register-schedulable=true --register-with-taints=node-role.kubernetes.io/master=:NoSchedule --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/"
+      command_background="true"
+      start_stop_daemon_args="--stdout /var/log/kubelet/${RC_SVCNAME}.log --stderr /var/log/kubelet/${RC_SVCNAME}.log"
+     
+      depend() {
+        need dockerd
+        provide kubelet
+      }   
+
 
       start_pre()
       {
-          # Ensure Service DIR exits
+          # Ensure Service/Log DIR exits
           mkdir -p /run/$RC_SVCNAME/
+          mkdir -p /var/log/$RC_SVCNAME/
       }
   - path: var/lib/kubelet/kubeconfig
     contents: |
@@ -95,6 +103,12 @@ files:
         user:
           client-certificate: /etc/srv/kubernetes/pki/apiserver.crt 
           client-key: /etc/srv/kubernetes/pki/apiserver.key
+  - path: etc/srv/kubernetes/pki/ca-certificates.crt
+    source: tls/ca.crt
+  - path: etc/srv/kubernetes/pki/apiserver.crt
+    source: tls/apiserver.crt
+  - path: etc/srv/kubernetes/pki/apiserver.key
+    source: tls/apiserver.key
   - path: etc/runlevels/default/dockerd
     symlink: "/etc/init.d/dockerd"
   - path: etc/runlevels/default/kubelet
