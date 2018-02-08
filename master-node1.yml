@@ -8,6 +8,7 @@ init:
   - iidlx/dockerd:e9bcfca8db2fb7615181295df7d02ad6386e1245
   - iidlx/kubernetes:ffd8d6643dfd4db2b7cf4f085bf14d59951f5be8-dirty
   - iidlx/etcd3:b0b95ed385a8fc63bb539f7f9031981c0c8d7ffa
+  - iidlx/cni:faaa05f98a9b208b1d1174e28a5dd3fd6d9688d1
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
   - linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
 files:
@@ -56,6 +57,33 @@ files:
 
       [metrics]
       address = ":13337"
+
+  - path: etc/init.d/etcd3
+    contents: |
+      #!/sbin/openrc-run
+
+      description="etcd"
+      pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+      name=$RC_SVCNAME
+      #supervisor=start-stop-daemon
+
+      command=/usr/bin/etcd
+      command_args="--name infra0 --discovery-srv goppa-internal.io --initial-advertise-peer-urls http://infra0.goppa-internal.io:2380 --initial-cluster-token etcd-cluster-1 --initial-cluster-state new --advertise-client-urls http://infra0.goppa-internal:2379 --listen-client-urls http://infra0.goppa-internal:2379 --listen-peer-urls http://infra0.example.com:2380"
+      command_background="true"
+      start_stop_daemon_args="--stdout /var/log/etcd/${RC_SVCNAME}.log --stderr /var/log/etcd/${RC_SVCNAME}.log"
+      depend() {
+        provide etcd
+      }
+
+
+      start_pre()
+      {
+          # Ensure Service/Log DIR exits
+          mkdir -p /run/$RC_SVCNAME/
+          mkdir -p /var/log/$RC_SVCNAME/
+      }
+
+
   - path: etc/init.d/kubelet
     mode: "777"
     contents: | 
