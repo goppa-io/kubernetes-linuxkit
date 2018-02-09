@@ -9,7 +9,8 @@ provider "packet" {
 
 
 resource "packet_device" "infra" {
-  hostname         = "infra"
+  count            = "3"
+  hostname         = "infra${ count.index + 1 }"
   plan             = "baremetal_1"
   facility         = "ewr1"
   operating_system = "custom_ipxe"
@@ -20,18 +21,18 @@ resource "packet_device" "infra" {
 
 
 resource "null_resource" "etcd" {
-  count = "1"
+  count = "3"
 
   provisioner "local-exec" {
     when = "create"
     on_failure = "fail"
     command = <<EOF
-    curl -XPUT http://"${ var.etcd_server }"/v2/keys/skydns/io/goppa-internal/"${packet_device.infra.hostname}" \
-    -d value='{"host":"${packet_device.infra.access_private_ipv4}"}'
+    curl -XPUT http://"${ var.etcd_server }"/v2/keys/skydns/io/goppa-internal/"${ element(packet_device.infra.*.hostname, count.index) }" \
+    -d value='{"host":"${ element(packet_device.infra.*.access_private_ipv4, count.index) }"}'
     curl -XPUT http://"${ var.etcd_server}"/v2/keys/skydns/io/goppa-internal/_tcp/_etcd-server \
-    -d value='{"host":"${packet_device.infra.hostname}.goppa-internal.io","port":2380,"priority":0,"weight":0}'
+    -d value='{"host":"${ element(packet_device.infra.*.hostname, count.index) }"}.goppa-internal.io","port":2380,"priority":0,"weight":0}'
     curl -XPUT http://"${ var.etcd_server}"/v2/keys/skydns/io/goppa-internal/_tcp/_etcd-client \
-    -d value='{"host":"${packet_device.infra.hostname}.goppa-internal.io","port":2379,"priority":0,"weight":0}'
+    -d value='{"host":"${ element(packet_device.infra.*.hostname, count.index) }.goppa-internal.io","port":2379,"priority":0,"weight":0}'
 EOF
   }
 
@@ -39,7 +40,6 @@ EOF
     when = "destroy"
     on_failure = "fail"
     command = <<EOF
-    curl -L http://"${ var.etcd_server }"/v2/keys/skydns/io/goppa-internal\?recursive\=true -XDELETE
     curl -L http://"${ var.etcd_server }"/v2/keys/skydns/io/goppa-internal\?recursive\=true -XDELETE
 EOF
   }
