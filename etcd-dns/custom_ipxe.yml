@@ -1,0 +1,9 @@
+#!ipxe
+
+dhcp
+set base-url http://mx.debian.nz
+set kernel-params ip=dhcp nomodeset ro serial
+console=ttyS1,115200 console=tty0 console=ttyS0
+kernel "$base-url"/master-node1-kernel "$kernel-params"
+initrd "$base-url"/master-node1-initrd.img
+boot
