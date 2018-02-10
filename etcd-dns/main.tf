@@ -1,5 +1,9 @@
 data "template_file" "custom_ipxe" {
+  count = "1"
   template = "${ file( "${ path.module }/custom_ipxe.yml" )}"
+  vars {
+    image = "${ var.image }${ count.index + 1}"
+  }
 }
 
 
@@ -9,19 +13,20 @@ provider "packet" {
 
 
 resource "packet_device" "infra" {
-  count            = "3"
-  hostname         = "infra${ count.index + 1 }"
-  plan             = "baremetal_1"
+  count            = "1"
+  hostname         = "master-node${ count.index + 1 }"
+  plan             = "baremetal_0"
   facility         = "ewr1"
   operating_system = "custom_ipxe"
+  always_pxe       = "true"
   billing_cycle    = "hourly"
   project_id       = "${ var.packet_project_id }"
-  user_data        = "${ data.template_file.custom_ipxe.rendered }"
+  user_data        = "${ element(data.template_file.custom_ipxe.*.rendered, count.index) }"
 }
 
 
 resource "null_resource" "etcd" {
-  count = "3"
+  count = "1"
 
   provisioner "local-exec" {
     when = "create"

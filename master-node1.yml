@@ -1,8 +1,8 @@
 kernel:
   image: linuxkit/kernel:4.9.78
-  cmdline: "console=tty0 console=ttyS0 rootfstype=tmpfs"
+  cmdline: "console=ttyS1 rootfstype=tmpfs"
 init:
-  - iidlx/openrc:2971a534dae5449786e2735f971941dfe7a07a4b
+  - iidlx/openrc:2971a534dae5449786e2735f971941dfe7a07a4b-dirty
   - linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
   - linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
   - iidlx/dockerd:e9bcfca8db2fb7615181295df7d02ad6386e1245
@@ -26,8 +26,8 @@ files:
     symlink: "/etc/init.d/hwclock"
   - path: etc/runlevels/boot/hostname
     symlink: "/etc/init.d/hostname"
-  - path: etc/runlevels/default/containerd
-    symlink: "/etc/init.d/containerd"
+  #- path: etc/runlevels/default/containerd
+  #  symlink: "/etc/init.d/containerd"
   - path: etc/runlevels/boot/networking
     symlink: "/etc/init.d/networking"
   - path: etc/modules-load.d/packet.conf
@@ -36,6 +36,9 @@ files:
     contents: |
       auto eth0
       iface eth0 inet dhcp
+  - path: etc/hostname
+    contents: |
+      master-node1.goppa-internal.io
   - path: etc/docker/daemon.json
     contents: '{"debug": true}'
   - path: etc/containerd/config.toml
@@ -68,7 +71,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/etcd
-      command_args="--name infra0 --discovery-srv goppa-internal.io --initial-advertise-peer-urls http://infra0.goppa-internal.io:2380 --initial-cluster-token etcd-cluster-1 --initial-cluster-state new --advertise-client-urls http://infra0.goppa-internal:2379 --listen-client-urls http://infra0.goppa-internal:2379 --listen-peer-urls http://infra0.example.com:2380"
+      command_args="--name master-node1 --discovery-srv goppa-internal.io --initial-advertise-peer-urls http://master-node1.goppa-internal.io:2380 --initial-cluster-token etcd-cluster-1 --initial-cluster-state new --advertise-client-urls http://master-node1.goppa-internal.io:2379 --listen-client-urls http://master-node1.goppa-internal.io:2379 --listen-peer-urls http://master-node1.goppa-internal.io:2380"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/etcd/${RC_SVCNAME}.log --stderr /var/log/etcd/${RC_SVCNAME}.log"
       depend() {
@@ -100,7 +103,7 @@ files:
       start_stop_daemon_args="--stdout /var/log/kubelet/${RC_SVCNAME}.log --stderr /var/log/kubelet/${RC_SVCNAME}.log"
      
       depend() {
-        need dockerd
+        #need dockerd
         provide kubelet
       }   
 
@@ -137,8 +140,8 @@ files:
     source: tls/apiserver.crt
   - path: etc/srv/kubernetes/pki/apiserver.key
     source: tls/apiserver.key
-  - path: etc/runlevels/default/dockerd
-    symlink: "/etc/init.d/dockerd"
+  #- path: etc/runlevels/default/dockerd
+  #  symlink: "/etc/init.d/dockerd"
   - path: etc/runlevels/default/kubelet
     symlink: "/etc/init.d/kubelet"
 trust:

@@ -15,7 +15,8 @@
 ::shutdown:/bin/umount -a -r
 
 # Put a getty on the serial port
-ttyS0::respawn:/sbin/agetty -a root -L ttyS0 115200 vt100
+#ttyS0::respawn:/sbin/agetty -a root -L ttyS0 115200 vt100
+ttyS1::respawn:/sbin/agetty -a root -L ttyS1 115200 vt100
 
 # Openrc 
 null::respawn:/sbin/syslogd -n -S -D -O /proc/1/fd/1
