@@ -5,6 +5,7 @@ RUN apk update && apk upgrade -a
 
 # add Go validation tools
 COPY go-compile.sh /go/bin/
+COPY etc/containerd/config.toml /etc/containerd/config.toml
 RUN apk add --no-cache git go musl-dev
 ENV GOPATH=/go PATH=$PATH:/go/bin
 RUN go get -u github.com/golang/lint/golint
@@ -28,6 +29,5 @@ RUN cd $GOPATH/src/github.com/containerd/containerd && \
 
 FROM scratch
 
-COPY --from=mirror /usr/bin/containerd /usr/bin/ctr /usr/bin/containerd-shim /usr/bin/
+COPY --from=mirror /go/src/github.com/containerd/containerd/bin/containerd /go/src/github.com/containerd/containerd/bin/ctr /go/src/github.com/containerd/containerd/bin/containerd-shim /usr/bin/
 COPY --from=mirror /etc/containerd/config.toml /etc/containerd/
-COPY --from=mirror /usr/share/zoneinfo/UTC /etc/localtime
