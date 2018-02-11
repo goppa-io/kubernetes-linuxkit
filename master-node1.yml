@@ -210,6 +210,7 @@ files:
           client-certificate: /etc/srv/kubernetes/pki/apiserver.crt
           client-key: /etc/srv/kubernetes/pki/apiserver.key
 
+
   - path: etc/init.d/kube-scheduler
     mode: "777"
     contents: |
@@ -224,6 +225,14 @@ files:
       command_args="--leader-elect=true --v=2 --kubeconfig=/var/lib/kube-scheduler/kubeconfig"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kube-scheduler/${RC_SVCNAME}.log --stderr /var/log/kube-scheduler/${RC_SVCNAME}.log"
+
+      start_pre()
+      {
+          # Ensure Service/Log DIR exits
+          mkdir -p /run/$RC_SVCNAME/
+          mkdir -p /var/log/$RC_SVCNAME/
+      }
+
 
   - path: var/lib/kube-scheduler/kubeconfig
     contents: |
@@ -261,6 +270,14 @@ files:
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kube-proxy/${RC_SVCNAME}.log --stderr /var/log/kube-proxy/${RC_SVCNAME}.log"
 
+      start_pre()
+      {
+          # Ensure Service/Log DIR exits
+          mkdir -p /run/$RC_SVCNAME/
+          mkdir -p /var/log/$RC_SVCNAME/
+      }
+
+
   - path: var/lib/kube-proxy/kubeconfig
     contents: |
       apiVersion: v1
@@ -284,6 +301,8 @@ files:
 
   - path: etc/srv/kubernetes/pki/ca-certificates.crt
     source: secrets/ca.crt
+  - path: etc/srv/kubernetes/pki/ca-certificates.key
+    source: secrets/ca.key
   - path: etc/srv/kubernetes/pki/apiserver.crt
     source: secrets/apiserver.crt
   - path: etc/srv/kubernetes/pki/apiserver.key
@@ -298,6 +317,14 @@ files:
     symlink: "/etc/init.d/kubelet"
   - path: etc/runlevels/default/etcd
     symlink: "/etc/init.d/etcd"
+  - path: etc/runlevels/default/kube-apiserver
+    symlink: "/etc/init.d/kube-apiserver"
+  - path: etc/runlevels/default/kube-controller-manager
+    symlink: "/etc/init.d/kube-controller-manager"
+  - path: etc/runlevels/default/kube-scheduler
+    symlink: "/etc/init.d/kube-scheduler"
+  - path: etc/runlevels/default/kube-proxy
+    symlink: "/etc/init.d/kube-proxy"
 trust:
   org:
     - linuxkit
