@@ -2,10 +2,10 @@ kernel:
   image: linuxkit/kernel:4.9.78
   cmdline: "console=ttyS1 rootfstype=tmpfs"
 init:
-  - iidlx/openrc:2971a534dae5449786e2735f971941dfe7a07a4b-dirty
-  - linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
-  - linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
-  - iidlx/dockerd:e9bcfca8db2fb7615181295df7d02ad6386e1245
+  - iidlx/openrc:030a5f2c41ca37b68eeec332a03718f42563b5b7-dirty
+  - iidlx/containerd:dd71f4fc21d5784eb04b12cd54b10b2df164964e-dirty
+  - iidlx/runc:8f2312eb99a074e4f9f9931457d7f13a4399ad8b
+  - iidlx/dockerd:58f47eb06582ff4901bd631227c99861bfbab90b-dirty
   - iidlx/kubernetes:ffd8d6643dfd4db2b7cf4f085bf14d59951f5be8-dirty
   - iidlx/etcd3:b0b95ed385a8fc63bb539f7f9031981c0c8d7ffa
   - iidlx/cni:faaa05f98a9b208b1d1174e28a5dd3fd6d9688d1
@@ -26,8 +26,8 @@ files:
     symlink: "/etc/init.d/hwclock"
   - path: etc/runlevels/boot/hostname
     symlink: "/etc/init.d/hostname"
-  #- path: etc/runlevels/default/containerd
-  #  symlink: "/etc/init.d/containerd"
+  - path: etc/runlevels/default/containerd
+    symlink: "/etc/init.d/containerd"
   - path: etc/runlevels/boot/networking
     symlink: "/etc/init.d/networking"
   - path: etc/modules-load.d/packet.conf
@@ -36,6 +36,7 @@ files:
     contents: |
       auto eth0
       iface eth0 inet dhcp
+              post-up echo 'nameserver 147.75.94.157' > /etc/resolv.conf
   - path: etc/hostname
     contents: |
       master-node1.goppa-internal.io
@@ -61,7 +62,8 @@ files:
       [metrics]
       address = ":13337"
 
-  - path: etc/init.d/etcd3
+  - path: etc/init.d/etcd
+    mode: "777"
     contents: |
       #!/sbin/openrc-run
 
@@ -103,7 +105,7 @@ files:
       start_stop_daemon_args="--stdout /var/log/kubelet/${RC_SVCNAME}.log --stderr /var/log/kubelet/${RC_SVCNAME}.log"
      
       depend() {
-        #need dockerd
+        need dockerd
         provide kubelet
       }   
 
@@ -140,10 +142,12 @@ files:
     source: tls/apiserver.crt
   - path: etc/srv/kubernetes/pki/apiserver.key
     source: tls/apiserver.key
-  #- path: etc/runlevels/default/dockerd
-  #  symlink: "/etc/init.d/dockerd"
+  - path: etc/runlevels/default/dockerd
+    symlink: "/etc/init.d/dockerd"
   - path: etc/runlevels/default/kubelet
     symlink: "/etc/init.d/kubelet"
+  - path: etc/runlevels/default/etcd
+    symlink: "/etc/init.d/etcd"
 trust:
   org:
     - linuxkit
