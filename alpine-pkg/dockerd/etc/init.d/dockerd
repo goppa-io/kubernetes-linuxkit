@@ -11,4 +11,5 @@ start_pre()
 {
     # Ensure Service DIR exits
     mkdir -p /run/$RC_SVCNAME/
+    export DOCKER_RAMDISK=true
 }
