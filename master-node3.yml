@@ -1,0 +1,154 @@
+kernel:
+  image: linuxkit/kernel:4.9.78
+  cmdline: "console=ttyS1 rootfstype=tmpfs"
+init:
+  - iidlx/openrc:030a5f2c41ca37b68eeec332a03718f42563b5b7-dirty
+  - iidlx/containerd:dd71f4fc21d5784eb04b12cd54b10b2df164964e-dirty
+  - iidlx/runc:8f2312eb99a074e4f9f9931457d7f13a4399ad8b
+  - iidlx/dockerd:58f47eb06582ff4901bd631227c99861bfbab90b-dirty
+  - iidlx/kubernetes:ffd8d6643dfd4db2b7cf4f085bf14d59951f5be8-dirty
+  - iidlx/etcd3:b0b95ed385a8fc63bb539f7f9031981c0c8d7ffa
+  - iidlx/cni:faaa05f98a9b208b1d1174e28a5dd3fd6d9688d1
+  - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
+  - linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
+files:
+  - path: /init
+    symlink: "/bin/busybox"
+  - path: etc/runlevels/sysinit/sysfs
+    symlink: "/etc/init.d/sysfs"
+  - path: etc/runlevels/sysinit/devfs
+    symlink: "/etc/init.d/devfs"
+  - path: etc/runlevels/sysinit/procfs
+    symlink: "/etc/init.d/procfs"
+  - path: etc/runlevels/sysinit/mdev
+    symlink: "/etc/init.d/mdev"
+  - path: etc/runlevels/sysinit/hwclock
+    symlink: "/etc/init.d/hwclock"
+  - path: etc/runlevels/boot/hostname
+    symlink: "/etc/init.d/hostname"
+  - path: etc/runlevels/default/containerd
+    symlink: "/etc/init.d/containerd"
+  - path: etc/runlevels/boot/networking
+    symlink: "/etc/init.d/networking"
+  - path: etc/modules-load.d/packet.conf
+    source: packet.conf
+  - path: etc/network/interfaces
+    contents: |
+      auto eth0
+      iface eth0 inet dhcp
+              post-up echo 'nameserver 147.75.94.157' > /etc/resolv.conf
+  - path: etc/hostname
+    contents: |
+      master-node3.goppa-internal.io
+  - path: etc/docker/daemon.json
+    contents: '{"debug": true}'
+  - path: etc/containerd/config.toml
+    contents: |
+      state = "/run/containerd"
+      root = "/var/lib/containerd"
+      snapshotter = "io.containerd.snapshotter.v1.overlayfs"
+      differ = "io.containerd.differ.v1.base-diff"
+      subreaper = false
+
+      [grpc]
+      address = "/run/containerd/containerd.sock"
+      uid = 0
+      gid = 0
+
+      [debug]
+      address = "/run/containerd/debug.sock"
+      level = "info"
+
+      [metrics]
+      address = ":13337"
+
+  - path: etc/init.d/etcd
+    mode: "777"
+    contents: |
+      #!/sbin/openrc-run
+
+      description="etcd"
+      pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+      name=$RC_SVCNAME
+      #supervisor=start-stop-daemon
+
+      command=/usr/bin/etcd
+      command_args="--name master-node3 --discovery-srv goppa-internal.io --initial-advertise-peer-urls http://master-node3.goppa-internal.io:2380 --initial-cluster-token etcd-cluster-1 --initial-cluster-state new --advertise-client-urls http://master-node3.goppa-internal.io:2379 --listen-client-urls http://master-node3.goppa-internal.io:2379 --listen-peer-urls http://master-node3.goppa-internal.io:2380"
+      command_background="true"
+      start_stop_daemon_args="--stdout /var/log/etcd/${RC_SVCNAME}.log --stderr /var/log/etcd/${RC_SVCNAME}.log"
+      depend() {
+        provide etcd
+      }
+
+
+      start_pre()
+      {
+          # Ensure Service/Log DIR exits
+          mkdir -p /run/$RC_SVCNAME/
+          mkdir -p /var/log/$RC_SVCNAME/
+      }
+
+
+  - path: etc/init.d/kubelet
+    mode: "777"
+    contents: | 
+      #!/sbin/openrc-run
+
+      description="Kubelet"
+      pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+      name=$RC_SVCNAME
+      #supervisor=start-stop-daemon
+
+      command=/usr/bin/kubelet
+      command_args="--allow-privileged=true --cgroup-root=/ --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=kubenet --node-labels=kubernetes.io/role=master --non-masquerade-cidr=100.64.0.0/10 --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --register-with-taints=node-role.kubernetes.io/master=:NoSchedule --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/"
+      command_background="true"
+      start_stop_daemon_args="--stdout /var/log/kubelet/${RC_SVCNAME}.log --stderr /var/log/kubelet/${RC_SVCNAME}.log"
+     
+      depend() {
+        need dockerd
+        provide kubelet
+      }   
+
+
+      start_pre()
+      {
+          # Ensure Service/Log DIR exits
+          mkdir -p /run/$RC_SVCNAME/
+          mkdir -p /var/log/$RC_SVCNAME/
+      }
+  - path: var/lib/kubelet/kubeconfig
+    contents: |
+      apiVersion: v1
+      clusters:
+      - cluster:
+          certificate-authority: /etc/srv/kubernetes/pki/ca-certificates.crt 
+          server: https://127.0.0.1
+        name: local
+      contexts:
+      - context:
+          cluster: local
+          user: kubelet
+        name: service-account-context
+      current-context: service-account-context
+      kind: Config
+      users:
+      - name: kubelet
+        user:
+          client-certificate: /etc/srv/kubernetes/pki/apiserver.crt 
+          client-key: /etc/srv/kubernetes/pki/apiserver.key
+  - path: etc/srv/kubernetes/pki/ca-certificates.crt
+    source: tls/ca.crt
+  - path: etc/srv/kubernetes/pki/apiserver.crt
+    source: tls/apiserver.crt
+  - path: etc/srv/kubernetes/pki/apiserver.key
+    source: tls/apiserver.key
+  - path: etc/runlevels/default/dockerd
+    symlink: "/etc/init.d/dockerd"
+  - path: etc/runlevels/default/kubelet
+    symlink: "/etc/init.d/kubelet"
+  - path: etc/runlevels/default/etcd
+    symlink: "/etc/init.d/etcd"
+trust:
+  org:
+    - linuxkit
+    - library
