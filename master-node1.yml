@@ -151,7 +151,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/kube-apiserver
-      command_args="--insecure-bind-address=127.0.0.1 --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,ResourceQuota --allow-privileged=true --anonymous-auth=false --apiserver-count=3 --basic-auth-file=/etc/srv/kubernetes/basic_auth.csv --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --etcd-servers=http://etcd.goppa-internal.io:2379 --insecure-port=8080 --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP --secure-port=443 --service-cluster-ip-range=100.64.0.0/13 --storage-backend=etcd3 --tls-cert-file=/etc/srv/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --token-auth-file=/etc/srv/kubernetes/known_tokens.csv --authorization-mode=AlwaysAllow" 
+      command_args="--insecure-bind-address=127.0.0.1 --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,ResourceQuota,PersistentVolumeLabel --allow-privileged=true --anonymous-auth=false --apiserver-count=3 --basic-auth-file=/etc/srv/kubernetes/basic_auth.csv --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --etcd-servers=http://etcd.goppa-internal.io:2379 --insecure-port=8080 --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP --secure-port=443 --service-cluster-ip-range=100.64.0.0/13 --storage-backend=etcd3 --tls-cert-file=/etc/srv/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --token-auth-file=/etc/srv/kubernetes/known_tokens.csv --authorization-mode=AlwaysAllow --v=2" 
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kube-apiserver/${RC_SVCNAME}.log --stderr /var/log/kube-apiserver/${RC_SVCNAME}.log"
 
@@ -167,6 +167,120 @@ files:
           mkdir -p /run/$RC_SVCNAME/
           mkdir -p /var/log/$RC_SVCNAME/
       }
+
+  - path: etc/init.d/kube-controller-manager
+    mode: "777"
+    contents: |
+      #!/sbin/openrc-run
+
+      description="Kube Controller Manager"
+      pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+      name=$RC_SVCNAME
+      #supervisor=start-stop-daemon
+
+      command=/usr/bin/kube-controller-manager
+      command_args="--allocate-node-cidrs=true --attach-detach-reconcile-sync-period=1m0s --cluster-cidr=100.96.0.0/11 --cluster-name=kubernetes --configure-cloud-routes=true --leader-elect=true --root-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --service-account-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --use-service-account-credentials=true --v=2 --kubeconfig=/var/lib/kube-controller-manager/kubeconfig --cluster-signing-cert-file=/etc/srv/kubernetes/pki/ca-certificates.crt --cluster-signing-key-file=/etc/srv/kubernetes/pki/ca-certificates.key"
+      command_background="true"
+      start_stop_daemon_args="--stdout /var/log/kube-controller-manager/${RC_SVCNAME}.log --stderr /var/log/kube-controller-manager/${RC_SVCNAME}.log"
+
+      start_pre()
+      {
+          # Ensure Service/Log DIR exits
+          mkdir -p /run/$RC_SVCNAME/
+          mkdir -p /var/log/$RC_SVCNAME/
+      }
+  - path: var/lib/kube-controller-manager/kubeconfig
+    contents: |
+      apiVersion: v1
+      clusters:
+      - cluster:
+          certificate-authority: /etc/srv/kubernetes/pki/ca-certificates.crt
+          server: https://127.0.0.1:443
+        name: local
+      contexts:
+      - context:
+          cluster: local
+          user: kube-controller-manager
+        name: service-account-context
+      current-context: service-account-context
+      kind: Config
+      users:
+      - name: kube-controller-manager
+        user:
+          client-certificate: /etc/srv/kubernetes/pki/apiserver.crt
+          client-key: /etc/srv/kubernetes/pki/apiserver.key
+
+  - path: etc/init.d/kube-scheduler
+    mode: "777"
+    contents: |
+      #!/sbin/openrc-run
+
+      description="Kube Scheduler"
+      pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+      name=$RC_SVCNAME
+      #supervisor=start-stop-daemon
+
+      command=/usr/bin/kube-scheduler
+      command_args="--leader-elect=true --v=2 --kubeconfig=/var/lib/kube-scheduler/kubeconfig"
+      command_background="true"
+      start_stop_daemon_args="--stdout /var/log/kube-scheduler/${RC_SVCNAME}.log --stderr /var/log/kube-scheduler/${RC_SVCNAME}.log"
+
+  - path: var/lib/kube-scheduler/kubeconfig
+    contents: |
+      apiVersion: v1
+      clusters:
+      - cluster:
+          certificate-authority: /etc/srv/kubernetes/pki/ca-certificates.crt
+          server: https://127.0.0.1:443
+        name: local
+      contexts:
+      - context:
+          cluster: local
+          user: kube-scheduler
+        name: service-account-context
+      current-context: service-account-context
+      kind: Config
+      users: 
+      - name: kube-scheduler
+        user:
+          client-certificate: /etc/srv/kubernetes/pki/apiserver.crt
+          client-key: /etc/srv/kubernetes/pki/apiserver.key
+
+  - path: etc/init.d/kube-proxy
+    mode: "777"
+    contents: |
+      #!/sbin/openrc-run
+
+      description="Kube Proxy"
+      pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+      name=$RC_SVCNAME
+      #supervisor=start-stop-daemon
+
+      command=/usr/bin/kube-proxy
+      command_args="--kubeconfig=/var/lib/kube-proxy/kubeconfig --conntrack-max-per-core=131072 --resource-container="" --cluster-cidr=100.96.0.0/11 --v=2"
+      command_background="true"
+      start_stop_daemon_args="--stdout /var/log/kube-proxy/${RC_SVCNAME}.log --stderr /var/log/kube-proxy/${RC_SVCNAME}.log"
+
+  - path: var/lib/kube-proxy/kubeconfig
+    contents: |
+      apiVersion: v1
+      clusters:
+      - cluster:
+          certificate-authority: /etc/srv/kubernetes/pki/ca-certificates.crt
+          server: https://127.0.0.1:443
+        name: local
+      contexts:
+      - context:
+          cluster: local
+          user: kube-proxy
+        name: service-account-context
+      current-context: service-account-context
+      kind: Config
+      users:
+      - name: kube-proxy
+        user:
+          client-certificate: /etc/srv/kubernetes/pki/apiserver.crt
+          client-key: /etc/srv/kubernetes/pki/apiserver.key
 
   - path: etc/srv/kubernetes/pki/ca-certificates.crt
     source: secrets/ca.crt
