@@ -2,7 +2,7 @@ kernel:
   image: linuxkit/kernel:4.9.78
   cmdline: "console=ttyS1 rootfstype=tmpfs"
 init:
-  - iidlx/openrc:030a5f2c41ca37b68eeec332a03718f42563b5b7-dirty
+  - iidlx/openrc:3f347f376552a78462a13aa898e01743ede4bde4
   - iidlx/containerd:dd71f4fc21d5784eb04b12cd54b10b2df164964e-dirty
   - iidlx/runc:8f2312eb99a074e4f9f9931457d7f13a4399ad8b
   - iidlx/dockerd:58f47eb06582ff4901bd631227c99861bfbab90b-dirty
@@ -26,12 +26,12 @@ files:
     symlink: "/etc/init.d/hwclock"
   - path: etc/runlevels/boot/hostname
     symlink: "/etc/init.d/hostname"
-  - path: etc/runlevels/boot/loopback
-    symlink: "/etc/init.d/loopback"
   - path: etc/runlevels/default/containerd
     symlink: "/etc/init.d/containerd"
   - path: etc/runlevels/boot/networking
     symlink: "/etc/init.d/networking"
+  - path: etc/runlevels/boot/loop-back
+    symlink: "/etc/init.d/loop-back"
   - path: etc/modules-load.d/packet.conf
     source: packet.conf
   - path: etc/network/interfaces
@@ -80,6 +80,7 @@ files:
       start_stop_daemon_args="--stdout /var/log/etcd/${RC_SVCNAME}.log --stderr /var/log/etcd/${RC_SVCNAME}.log"
       depend() {
         provide etcd
+        #need loop-back
       }
 
 
@@ -124,7 +125,7 @@ files:
       clusters:
       - cluster:
           certificate-authority: /etc/srv/kubernetes/pki/ca-certificates.crt 
-          server: https://127.0.0.1
+          server: https://127.0.0.1:443
         name: local
       contexts:
       - context:
