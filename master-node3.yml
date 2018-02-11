@@ -73,7 +73,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/etcd
-      command_args="--name master-node3 --discovery-srv goppa-internal.io --initial-advertise-peer-urls http://master-node3.goppa-internal.io:2380 --initial-cluster-token etcd-cluster-1 --initial-cluster-state new --advertise-client-urls http://master-node3.goppa-internal.io:2379 --listen-client-urls http://master-node3.goppa-internal.io:2379 --listen-peer-urls http://master-node3.goppa-internal.io:2380"
+      command_args="--name master-node3 --discovery-srv goppa-internal.io --initial-advertise-peer-urls http://master-node3.goppa-internal.io:2380 --initial-cluster-token etcd-cluster-1 --initial-cluster-state new --advertise-client-urls http://master-node3.goppa-internal.io:2379 --listen-client-urls http://0.0.0.0:2379 --listen-peer-urls http://0.0.0.0:2380"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/etcd/${RC_SVCNAME}.log --stderr /var/log/etcd/${RC_SVCNAME}.log"
       depend() {
