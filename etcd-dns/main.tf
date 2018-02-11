@@ -33,7 +33,7 @@ resource "null_resource" "etcd" {
     on_failure = "fail"
     command = <<EOF
     curl -XPUT http://"${ var.etcd_server }"/v2/keys/skydns/io/goppa-internal/"${ element(packet_device.infra.*.hostname, count.index) }" \
-    -d value='{"host":"${ element(packet_device.infra.*.access_private_ipv4, count.index) }"}'
+    -d value='{"host":"${ element(packet_device.infra.*.access_public_ipv4, count.index) }"}'
 
     curl -XPUT http://"${ var.etcd_server}"/v2/keys/skydns/io/goppa-internal/_tcp/_etcd-server/"${ element(packet_device.infra.*.hostname, count.index) }" \
     -d value='{"host":"${ element(packet_device.infra.*.hostname, count.index) }.goppa-internal.io","port":2380,"priority":0,"weight":0}'
