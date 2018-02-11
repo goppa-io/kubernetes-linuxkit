@@ -44,6 +44,9 @@ resource "null_resource" "etcd" {
     curl -XPUT http://"${ var.etcd_server }"/v2/keys/skydns/io/goppa-internal/etcd/"${ element(packet_device.infra.*.hostname, count.index) }" \
     -d value='{"host":"${ element(packet_device.infra.*.access_public_ipv4, count.index) }"}'
 
+    curl -XPUT http://"${ var.etcd_server }"/v2/keys/skydns/io/goppa-internal/master/"${ element(packet_device.infra.*.hostname, count.index) }" \
+    -d value='{"host":"${ element(packet_device.infra.*.access_public_ipv4, count.index) }"}'
+
 EOF
   }
 
