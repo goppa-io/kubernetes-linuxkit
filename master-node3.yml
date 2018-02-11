@@ -26,6 +26,8 @@ files:
     symlink: "/etc/init.d/hwclock"
   - path: etc/runlevels/boot/hostname
     symlink: "/etc/init.d/hostname"
+  - path: etc/runlevels/boot/loopback
+    symlink: "/etc/init.d/loopback"
   - path: etc/runlevels/default/containerd
     symlink: "/etc/init.d/containerd"
   - path: etc/runlevels/boot/networking
