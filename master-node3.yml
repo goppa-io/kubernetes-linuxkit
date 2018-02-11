@@ -88,7 +88,6 @@ files:
           mkdir -p /var/log/$RC_SVCNAME/
       }
 
-
   - path: etc/init.d/kubelet
     mode: "777"
     contents: | 
@@ -116,6 +115,7 @@ files:
           mkdir -p /run/$RC_SVCNAME/
           mkdir -p /var/log/$RC_SVCNAME/
       }
+
   - path: var/lib/kubelet/kubeconfig
     contents: |
       apiVersion: v1
@@ -136,12 +136,45 @@ files:
         user:
           client-certificate: /etc/srv/kubernetes/pki/apiserver.crt 
           client-key: /etc/srv/kubernetes/pki/apiserver.key
+
+  - path: etc/init.d/kube-apiserver
+    mode: "777"
+    contents: |
+      #!/sbin/openrc-run
+
+      description="Kube Apiserver"
+      pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+      name=$RC_SVCNAME
+      #supervisor=start-stop-daemon
+
+      command=/usr/bin/kube-apiserver
+      command_args="--address=127.0.0.1 --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,DefaultTolerationSeconds,ResourceQuota --allow-privileged=true --anonymous-auth=false --apiserver-count=3 --basic-auth-file=/etc/srv/kubernetes/basic_auth.csv --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --etcd-servers-overrides=/events#http:// --etcd-servers=http:// --insecure-port=8080 --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP --secure-port=443 --service-cluster-ip-range=100.64.0.0/13 --storage-backend=etcd3 --tls-cert-file=/etc/srv/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --token-auth-file=/etc/srv/kubernetes/known_tokens.csv --authorization-mode=AlwaysAllow" 
+      command_background="true"
+      start_stop_daemon_args="--stdout /var/log/kube-apiserver/${RC_SVCNAME}.log --stderr /var/log/kube-apiserver/${RC_SVCNAME}.log"
+
+      depend() {
+        need etcd
+        provide kube-apiserver
+      }
+
+
+      start_pre()
+      {
+          # Ensure Service/Log DIR exits
+          mkdir -p /run/$RC_SVCNAME/
+          mkdir -p /var/log/$RC_SVCNAME/
+      }
+
   - path: etc/srv/kubernetes/pki/ca-certificates.crt
-    source: tls/ca.crt
+    source: secrets/ca.crt
   - path: etc/srv/kubernetes/pki/apiserver.crt
-    source: tls/apiserver.crt
+    source: secrets/apiserver.crt
   - path: etc/srv/kubernetes/pki/apiserver.key
-    source: tls/apiserver.key
+    source: secrets/apiserver.key
+  - path: etc/srv/kubernetes/basic_auth.csv
+    source: secrets/basic_auth.csv
+  - path: etc/srv/kubernetes/known_tokens.csv
+    source: secrets/known_tokens.csv
   - path: etc/runlevels/default/dockerd
     symlink: "/etc/init.d/dockerd"
   - path: etc/runlevels/default/kubelet
