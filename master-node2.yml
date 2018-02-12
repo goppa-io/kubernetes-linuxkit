@@ -179,7 +179,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/kube-controller-manager
-      command_args="--allocate-node-cidrs=true --attach-detach-reconcile-sync-period=1m0s --cluster-cidr=100.96.0.0/11 --cluster-name=kubernetes --configure-cloud-routes=true --leader-elect=true --root-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --service-account-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --use-service-account-credentials=true --v=2 --kubeconfig=/var/lib/kube-controller-manager/kubeconfig --cluster-signing-cert-file=/etc/srv/kubernetes/pki/ca-certificates.crt --cluster-signing-key-file=/etc/srv/kubernetes/pki/ca-certificates.key"
+      command_args="--allocate-node-cidrs=true --attach-detach-reconcile-sync-period=1m0s --cluster-cidr=100.96.0.0/11 --cluster-name=kubernetes --configure-cloud-routes=true --leader-elect=true --root-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --service-account-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --service-cluster-ip-range=100.64.0.0/13 --use-service-account-credentials=true --v=2 --kubeconfig=/var/lib/kube-controller-manager/kubeconfig --cluster-signing-cert-file=/etc/srv/kubernetes/pki/ca-certificates.crt --cluster-signing-key-file=/etc/srv/kubernetes/pki/ca-certificates.key"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kube-controller-manager/${RC_SVCNAME}.log --stderr /var/log/kube-controller-manager/${RC_SVCNAME}.log"
 
