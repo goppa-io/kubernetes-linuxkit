@@ -24,6 +24,7 @@ resource "null_resource" "certs_to_disk" {
     echo "${ tls_private_key.client_key.private_key_pem }" > client.key 
     echo "${ data.template_file.known_tokens_csv.rendered }" > basic_auth.csv
     echo "${ data.template_file.basic_auth_csv.rendered }" > known_tokens.csv
+    echo "${ data.template_file.kubelet_kubeconfig.rendered }" > kubeconfig_auth
 EOF
   }
 
