@@ -6,7 +6,7 @@ init:
   - iidlx/containerd:dd71f4fc21d5784eb04b12cd54b10b2df164964e-dirty
   - iidlx/runc:8f2312eb99a074e4f9f9931457d7f13a4399ad8b
   - iidlx/dockerd:58f47eb06582ff4901bd631227c99861bfbab90b-dirty
-  - iidlx/kubernetes:ffd8d6643dfd4db2b7cf4f085bf14d59951f5be8-dirty
+  - iidlx/kubernetes-worker:b4090a8b48515844b409d0dfc9a4dccc28c9078a
   - iidlx/cni:faaa05f98a9b208b1d1174e28a5dd3fd6d9688d1
   - iidlx/socat:a5274d356e74782386222a7b8906951dc32e8b98
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
