@@ -9,6 +9,7 @@ init:
   - iidlx/kubernetes:ffd8d6643dfd4db2b7cf4f085bf14d59951f5be8-dirty
   - iidlx/etcd3:b0b95ed385a8fc63bb539f7f9031981c0c8d7ffa
   - iidlx/cni:faaa05f98a9b208b1d1174e28a5dd3fd6d9688d1
+  - iidlx/socat:a5274d356e74782386222a7b8906951dc32e8b98
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
   - linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
 files:
