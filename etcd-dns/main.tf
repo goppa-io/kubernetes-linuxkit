@@ -1,16 +1,22 @@
-data "template_file" "custom_ipxe" {
-  count = "3"
-  template = "${ file( "${ path.module }/custom_ipxe.yml" )}"
-  vars {
-    image = "${ var.image }${ count.index + 1}"
-  }
-}
-
-
 provider "packet" {
   auth_token = "${var.auth_token}"
 }
 
+data "template_file" "custom_ipxe_master" {
+  count = "3"
+  template = "${ file( "${ path.module }/custom_ipxe.yml" )}"
+  vars {
+    image = "${ var.master_image }${ count.index + 1}"
+  }
+}
+
+data "template_file" "custom_ipxe_worker" {
+  count = "3"
+  template = "${ file( "${ path.module }/custom_ipxe.yml" )}"
+  vars {
+    image = "${ var.worker_image }${ count.index + 1}"
+  }
+}
 
 resource "packet_device" "infra" {
   count            = "3"
@@ -21,8 +27,21 @@ resource "packet_device" "infra" {
   always_pxe       = "true"
   billing_cycle    = "hourly"
   project_id       = "${ var.packet_project_id }"
-  user_data        = "${ element(data.template_file.custom_ipxe.*.rendered, count.index) }"
+  user_data        = "${ element(data.template_file.custom_ipxe_master.*.rendered, count.index) }"
 }
+
+resource "packet_device" "worker" {
+  count            = "3"
+  hostname         = "worker-node${ count.index + 1 }"
+  plan             = "baremetal_0"
+  facility         = "ewr1"
+  operating_system = "custom_ipxe"
+  always_pxe       = "true"
+  billing_cycle    = "hourly"
+  project_id       = "${ var.packet_project_id }"
+  user_data        = "${ element(data.template_file.custom_ipxe_worker.*.rendered, count.index) }"
+}
+
 
 
 resource "null_resource" "etcd" {
