@@ -7,7 +7,7 @@ init:
   - iidlx/runc:8f2312eb99a074e4f9f9931457d7f13a4399ad8b
   - iidlx/dockerd:909370185bd541b000520835c8bbacb45e8f47ea
   - iidlx/kubernetes-master:bfbf0598092e60286049fc16c79a6f891ba5abcf
-  - iidlx/etcd3:b0b95ed385a8fc63bb539f7f9031981c0c8d7ffa
+  - iidlx/etcd3:dc482d467e1d89b32bf5ad304064df674feffb73
   - iidlx/cni:faaa05f98a9b208b1d1174e28a5dd3fd6d9688d1
   - iidlx/socat:a5274d356e74782386222a7b8906951dc32e8b98
   - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
