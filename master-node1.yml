@@ -3,6 +3,7 @@ kernel:
   cmdline: "console=ttyS1 rootfstype=tmpfs"
 init:
   - iidlx/openrc:3f347f376552a78462a13aa898e01743ede4bde4
+  - iidlx/metadata:7bf10bcc7fb22ced0f5d8c4cee3a4b2064357c51
   - iidlx/containerd:dd71f4fc21d5784eb04b12cd54b10b2df164964e-dirty
   - iidlx/runc:8f2312eb99a074e4f9f9931457d7f13a4399ad8b
   - iidlx/dockerd:909370185bd541b000520835c8bbacb45e8f47ea
