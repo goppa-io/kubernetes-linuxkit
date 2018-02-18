@@ -98,6 +98,11 @@ files:
           mkdir -p /var/log/$RC_SVCNAME/
       }
 
+      depend() {
+        need bond
+        provide etcd
+      }
+
   - path: etc/init.d/kubelet
     mode: "777"
     contents: | 
