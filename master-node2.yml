@@ -43,7 +43,7 @@ files:
         need networking
         provide bond
       }
-  - path: etc/runlevels/boot/bond
+  - path: etc/runlevels/default/bond
     symlink: "/etc/init.d/bond"
   - path: etc/runlevels/boot/loop-back
     symlink: "/etc/init.d/loop-back"
