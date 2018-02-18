@@ -30,7 +30,8 @@ files:
     symlink: "/etc/init.d/containerd"
   - path: etc/runlevels/boot/networking
     symlink: "/etc/init.d/networking"
-  - path: etc/runlevels/boot/bond
+  - path: etc/init.d/bond
+    mode: "777"
     contents: |
       #!/sbin/openrc-run
       description="Configures bond0 and sets the hostname of the machine."
@@ -42,7 +43,8 @@ files:
         need networking
         provide bond
       }
-
+  - path: etc/runlevels/boot/bond
+    symlink: "/etc/init.d/bond"
   - path: etc/runlevels/boot/loop-back
     symlink: "/etc/init.d/loop-back"
   - path: etc/modules-load.d/packet.conf
