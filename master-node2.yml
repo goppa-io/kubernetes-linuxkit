@@ -26,12 +26,23 @@ files:
     symlink: "/etc/init.d/mdev"
   - path: etc/runlevels/sysinit/hwclock
     symlink: "/etc/init.d/hwclock"
-  - path: etc/runlevels/boot/hostname
-    symlink: "/etc/init.d/hostname"
   - path: etc/runlevels/default/containerd
     symlink: "/etc/init.d/containerd"
   - path: etc/runlevels/boot/networking
     symlink: "/etc/init.d/networking"
+  - path: etc/runlevels/boot/bond
+    contents: |
+      #!/sbin/openrc-run
+      description="Configures bond0 and sets the hostname of the machine."
+
+      command=/usr/bin/metadata
+      command_args="packet"
+
+      depend() {
+        need networking
+        provide bond
+      }
+
   - path: etc/runlevels/boot/loop-back
     symlink: "/etc/init.d/loop-back"
   - path: etc/modules-load.d/packet.conf
@@ -41,9 +52,6 @@ files:
       auto eth0
       iface eth0 inet dhcp
               post-up echo 'nameserver 147.75.94.157' > /etc/resolv.conf
-  - path: etc/hostname
-    contents: |
-      master-node2.goppa-internal.io
   - path: etc/docker/daemon.json
     contents: '{"debug": true}'
   - path: etc/containerd/config.toml
@@ -80,11 +88,6 @@ files:
       command_args="--name master-node2 --discovery-srv goppa-internal.io --initial-advertise-peer-urls http://master-node2.goppa-internal.io:2380 --initial-cluster-token etcd-cluster-1 --initial-cluster-state new --advertise-client-urls http://master-node2.goppa-internal.io:2379 --listen-client-urls http://0.0.0.0:2379 --listen-peer-urls http://0.0.0.0:2380"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/etcd/${RC_SVCNAME}.log --stderr /var/log/etcd/${RC_SVCNAME}.log"
-      depend() {
-        #need loop-back
-        provide etcd
-      }
-
 
       start_pre()
       {
@@ -313,6 +316,8 @@ files:
     source: secrets/basic_auth.csv
   - path: etc/srv/kubernetes/known_tokens.csv
     source: secrets/known_tokens.csv
+  - path: etc/srv/kubernetes/kubeconfig_auth
+    source: secrets/kubeconfig_auth
   - path: etc/runlevels/default/dockerd
     symlink: "/etc/init.d/dockerd"
   - path: etc/runlevels/default/kubelet
@@ -327,7 +332,6 @@ files:
     symlink: "/etc/init.d/kube-scheduler"
   - path: etc/runlevels/default/kube-proxy
     symlink: "/etc/init.d/kube-proxy"
-
 trust:
   org:
     - linuxkit
