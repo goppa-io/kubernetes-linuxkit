@@ -57,7 +57,7 @@ files:
               post-up echo 'nameserver 147.75.94.157' > /etc/resolv.conf
   - path: etc/hostname
     contents: |
-      worker-node1.goppa-internal.io
+      worker-node2.goppa-internal.io
   - path: etc/docker/daemon.json
     contents: '{"debug": true}'
   - path: etc/containerd/config.toml
