@@ -26,6 +26,8 @@ files:
     symlink: "/etc/init.d/mdev"
   - path: etc/runlevels/sysinit/hwclock
     symlink: "/etc/init.d/hwclock"
+  - path: etc/runlevels/boot/hostname
+    symlink: "/etc/init.d/hostname"
   - path: etc/runlevels/default/containerd
     symlink: "/etc/init.d/containerd"
   - path: etc/runlevels/boot/networking
@@ -43,8 +45,8 @@ files:
         need networking
         provide bond
       }
-  - path: etc/runlevels/default/bond
-    symlink: "/etc/init.d/bond"
+  #- path: etc/runlevels/default/bond
+  #  symlink: "/etc/init.d/bond"
   - path: etc/runlevels/boot/loop-back
     symlink: "/etc/init.d/loop-back"
   - path: etc/modules-load.d/packet.conf
@@ -54,6 +56,9 @@ files:
       auto eth0
       iface eth0 inet dhcp
               post-up echo 'nameserver 147.75.94.157' > /etc/resolv.conf
+  - path: etc/hostname
+    contents: |
+      master-node3.goppa-internal.io
   - path: etc/docker/daemon.json
     contents: '{"debug": true}'
   - path: etc/containerd/config.toml
@@ -99,7 +104,7 @@ files:
       }
 
       depend() {
-        need bond
+        #need bond
         provide etcd
       }
 
@@ -114,7 +119,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/kubelet
-      command_args="--allow-privileged=true --cgroup-root=/ --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=kubenet --node-labels=kubernetes.io/role=master --non-masquerade-cidr=100.64.0.0/10 --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --register-with-taints=node-role.kubernetes.io/master=:NoSchedule --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/"
+      command_args="--allow-privileged=true --cgroup-root=/ --cluster-dns=10.11.12.254 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=cni --node-labels=kubernetes.io/role=master --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kubelet/${RC_SVCNAME}.log --stderr /var/log/kubelet/${RC_SVCNAME}.log"
      
@@ -163,7 +168,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/kube-apiserver
-      command_args="--insecure-bind-address=127.0.0.1 --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,ResourceQuota,PersistentVolumeLabel --allow-privileged=true --anonymous-auth=false --apiserver-count=3 --basic-auth-file=/etc/srv/kubernetes/basic_auth.csv --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --etcd-servers=http://etcd.goppa-internal.io:2379 --insecure-port=8080 --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP --secure-port=443 --service-cluster-ip-range=100.64.0.0/13 --storage-backend=etcd3 --tls-cert-file=/etc/srv/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --token-auth-file=/etc/srv/kubernetes/known_tokens.csv --authorization-mode=AlwaysAllow --v=2" 
+      command_args="--insecure-bind-address=127.0.0.1 --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,ResourceQuota,PersistentVolumeLabel --allow-privileged=true --anonymous-auth=false --apiserver-count=3 --basic-auth-file=/etc/srv/kubernetes/basic_auth.csv --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --etcd-servers=http://etcd.goppa-internal.io:2379 --insecure-port=8080 --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP --secure-port=443 --service-cluster-ip-range=10.11.12.0/24 --storage-backend=etcd3 --tls-cert-file=/etc/srv/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --token-auth-file=/etc/srv/kubernetes/known_tokens.csv --authorization-mode=AlwaysAllow --v=2" 
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kube-apiserver/${RC_SVCNAME}.log --stderr /var/log/kube-apiserver/${RC_SVCNAME}.log"
 
@@ -191,7 +196,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/kube-controller-manager
-      command_args="--allocate-node-cidrs=true --attach-detach-reconcile-sync-period=1m0s --cluster-cidr=100.96.0.0/11 --cluster-name=kubernetes --configure-cloud-routes=false --leader-elect=true --root-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --service-account-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --service-cluster-ip-range=100.64.0.0/13 --use-service-account-credentials=true --v=2 --kubeconfig=/var/lib/kube-controller-manager/kubeconfig --cluster-signing-cert-file=/etc/srv/kubernetes/pki/ca-certificates.crt --cluster-signing-key-file=/etc/srv/kubernetes/pki/ca-certificates.key"
+      command_args="--allocate-node-cidrs=false --attach-detach-reconcile-sync-period=1m0s --cluster-name=kubernetes --leader-elect=true --root-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --service-account-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --service-cluster-ip-range=100.64.0.0/13 --use-service-account-credentials=true --v=2 --kubeconfig=/var/lib/kube-controller-manager/kubeconfig --cluster-signing-cert-file=/etc/srv/kubernetes/pki/ca-certificates.crt --cluster-signing-key-file=/etc/srv/kubernetes/pki/ca-certificates.key"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kube-controller-manager/${RC_SVCNAME}.log --stderr /var/log/kube-controller-manager/${RC_SVCNAME}.log"
 
@@ -278,7 +283,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/kube-proxy
-      command_args="--kubeconfig=/var/lib/kube-proxy/kubeconfig --conntrack-max-per-core=131072 --resource-container="" --cluster-cidr=100.96.0.0/11 --v=2"
+      command_args="--kubeconfig=/var/lib/kube-proxy/kubeconfig --conntrack-max-per-core=131072 --resource-container="" --v=2"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kube-proxy/${RC_SVCNAME}.log --stderr /var/log/kube-proxy/${RC_SVCNAME}.log"
 

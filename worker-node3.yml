@@ -1,0 +1,193 @@
+kernel:
+  image: linuxkit/kernel:4.9.78
+  cmdline: "console=ttyS1 rootfstype=tmpfs"
+init:
+  - iidlx/openrc:3f347f376552a78462a13aa898e01743ede4bde4
+  - iidlx/metadata:7bf10bcc7fb22ced0f5d8c4cee3a4b2064357c51
+  - iidlx/containerd:dd71f4fc21d5784eb04b12cd54b10b2df164964e-dirty
+  - iidlx/runc:8f2312eb99a074e4f9f9931457d7f13a4399ad8b
+  - iidlx/dockerd:909370185bd541b000520835c8bbacb45e8f47ea
+  - iidlx/kubernetes-worker:b4090a8b48515844b409d0dfc9a4dccc28c9078a
+  - iidlx/cni:faaa05f98a9b208b1d1174e28a5dd3fd6d9688d1
+  - iidlx/socat:a5274d356e74782386222a7b8906951dc32e8b98
+  - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
+  - linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
+files:
+  - path: /init
+    symlink: "/bin/busybox"
+  - path: etc/runlevels/sysinit/sysfs
+    symlink: "/etc/init.d/sysfs"
+  - path: etc/runlevels/sysinit/devfs
+    symlink: "/etc/init.d/devfs"
+  - path: etc/runlevels/sysinit/procfs
+    symlink: "/etc/init.d/procfs"
+  - path: etc/runlevels/sysinit/mdev
+    symlink: "/etc/init.d/mdev"
+  - path: etc/runlevels/sysinit/hwclock
+    symlink: "/etc/init.d/hwclock"
+  - path: etc/runlevels/boot/hostname
+    symlink: "/etc/init.d/hostname"
+  - path: etc/runlevels/default/containerd
+    symlink: "/etc/init.d/containerd"
+  #- path: etc/runlevels/boot/networking
+  #  symlink: "/etc/init.d/networking"
+  - path: etc/init.d/bond
+    mode: "777"
+    contents: |
+      #!/sbin/openrc-run
+      description="Configures bond0 and sets the hostname of the machine."
+
+      command=/usr/bin/metadata
+      command_args="packet"
+
+      depend() {
+        need networking
+        provide bond
+      }
+  - path: etc/runlevels/boot/bond
+    symlink: "/etc/init.d/bond"
+  - path: etc/runlevels/boot/loop-back
+    symlink: "/etc/init.d/loop-back"
+  - path: etc/modules-load.d/packet.conf
+    source: packet.conf
+  - path: etc/network/interfaces
+    contents: |
+      auto eth0
+      iface eth0 inet dhcp
+              post-up echo 'nameserver 147.75.94.157' > /etc/resolv.conf
+  - path: etc/hostname
+    contents: |
+      worker-node1.goppa-internal.io
+  - path: etc/docker/daemon.json
+    contents: '{"debug": true}'
+  - path: etc/containerd/config.toml
+    contents: |
+      state = "/run/containerd"
+      root = "/var/lib/containerd"
+      snapshotter = "io.containerd.snapshotter.v1.overlayfs"
+      differ = "io.containerd.differ.v1.base-diff"
+      subreaper = false
+
+      [grpc]
+      address = "/run/containerd/containerd.sock"
+      uid = 0
+      gid = 0
+
+      [debug]
+      address = "/run/containerd/debug.sock"
+      level = "info"
+
+      [metrics]
+      address = ":13337"
+
+  - path: etc/init.d/kubelet
+    mode: "777"
+    contents: | 
+      #!/sbin/openrc-run
+
+      description="Kubelet"
+      pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+      name=$RC_SVCNAME
+      #supervisor=start-stop-daemon
+
+      command=/usr/bin/kubelet
+      command_args="--allow-privileged=true --cgroup-root=/ --cluster-dns=10.11.12.254 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=cni --node-labels=kubernetes.io/role=node --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/"
+      command_background="true"
+      start_stop_daemon_args="--stdout /var/log/kubelet/${RC_SVCNAME}.log --stderr /var/log/kubelet/${RC_SVCNAME}.log"
+     
+      depend() {
+        need dockerd
+        provide kubelet
+      }   
+
+
+      start_pre()
+      {
+          # Ensure Service/Log DIR exits
+          mkdir -p /run/$RC_SVCNAME/
+          mkdir -p /var/log/$RC_SVCNAME/
+      }
+
+  - path: var/lib/kubelet/kubeconfig
+    contents: |
+      apiVersion: v1
+      clusters:
+      - cluster:
+          certificate-authority: /etc/srv/kubernetes/pki/ca-certificates.crt 
+          server: https://internal-master.goppa-internal.io:443
+        name: local
+      contexts:
+      - context:
+          cluster: local
+          user: kubelet
+        name: service-account-context
+      current-context: service-account-context
+      kind: Config
+      users:
+      - name: kubelet
+        user:
+          client-certificate: /etc/srv/kubernetes/pki/worker.crt 
+          client-key: /etc/srv/kubernetes/pki/worker.key
+
+  - path: etc/init.d/kube-proxy
+    mode: "777"
+    contents: |
+      #!/sbin/openrc-run
+
+      description="Kube Proxy"
+      pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+      name=$RC_SVCNAME
+      #supervisor=start-stop-daemon
+
+      command=/usr/bin/kube-proxy
+      command_args="--kubeconfig=/var/lib/kube-proxy/kubeconfig --conntrack-max-per-core=131072 --resource-container="" --v=2"
+      command_background="true"
+      start_stop_daemon_args="--stdout /var/log/kube-proxy/${RC_SVCNAME}.log --stderr /var/log/kube-proxy/${RC_SVCNAME}.log"
+
+      start_pre()
+      {
+          # Ensure Service/Log DIR exits
+          mkdir -p /run/$RC_SVCNAME/
+          mkdir -p /var/log/$RC_SVCNAME/
+      }
+
+
+  - path: var/lib/kube-proxy/kubeconfig
+    contents: |
+      apiVersion: v1
+      clusters:
+      - cluster:
+          certificate-authority: /etc/srv/kubernetes/pki/ca-certificates.crt
+          server: https://internal-master.goppa-internal.io:443
+        name: local
+      contexts:
+      - context:
+          cluster: local
+          user: kube-proxy
+        name: service-account-context
+      current-context: service-account-context
+      kind: Config
+      users:
+      - name: kube-proxy
+        user:
+          client-certificate: /etc/srv/kubernetes/pki/worker.crt
+          client-key: /etc/srv/kubernetes/pki/worker.key
+
+  - path: etc/srv/kubernetes/pki/ca-certificates.crt
+    source: secrets/ca.crt
+  - path: etc/srv/kubernetes/pki/ca-certificates.key
+    source: secrets/ca.key
+  - path: etc/srv/kubernetes/pki/worker.crt
+    source: secrets/worker.crt
+  - path: etc/srv/kubernetes/pki/worker.key
+    source: secrets/worker.key
+  - path: etc/runlevels/default/dockerd
+    symlink: "/etc/init.d/dockerd"
+  - path: etc/runlevels/default/kubelet
+    symlink: "/etc/init.d/kubelet"
+  - path: etc/runlevels/default/kube-proxy
+    symlink: "/etc/init.d/kube-proxy"
+trust:
+  org:
+    - linuxkit
+    - library
