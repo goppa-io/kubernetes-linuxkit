@@ -29,8 +29,8 @@ files:
     symlink: "/etc/init.d/hostname"
   - path: etc/runlevels/default/containerd
     symlink: "/etc/init.d/containerd"
-  #- path: etc/runlevels/boot/networking
-  #  symlink: "/etc/init.d/networking"
+  - path: etc/runlevels/boot/networking
+    symlink: "/etc/init.d/networking"
   - path: etc/init.d/bond
     mode: "777"
     contents: |
@@ -44,8 +44,8 @@ files:
         need networking
         provide bond
       }
-  - path: etc/runlevels/boot/bond
-    symlink: "/etc/init.d/bond"
+  #- path: etc/runlevels/boot/bond
+  #  symlink: "/etc/init.d/bond"
   - path: etc/runlevels/boot/loop-back
     symlink: "/etc/init.d/loop-back"
   - path: etc/modules-load.d/packet.conf
