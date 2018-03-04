@@ -91,7 +91,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/kubelet
-      command_args="--allow-privileged=true --cgroup-root=/ --cluster-dns=10.11.12.254 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=cni --node-labels=kubernetes.io/role=node --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/"
+      command_args="--allow-privileged=true --anonymous-auth=false --authorization-mode=Webhook --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --cgroup-root=/ --cluster-dns=10.11.12.254 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=cni --node-labels=kubernetes.io/role=node --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/ --tls-cert-file=etc/srv/kubernetes/pki/worker-node3.crt --tls-private-key-file=/etc/srv/kubernetes/pki/worker-node3.key"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kubelet/${RC_SVCNAME}.log --stderr /var/log/kubelet/${RC_SVCNAME}.log"
      
@@ -126,8 +126,8 @@ files:
       users:
       - name: kubelet
         user:
-          client-certificate: /etc/srv/kubernetes/pki/worker.crt 
-          client-key: /etc/srv/kubernetes/pki/worker.key
+          client-certificate: /etc/srv/kubernetes/pki/worker-node3.crt 
+          client-key: /etc/srv/kubernetes/pki/worker-node3.key
 
   - path: etc/init.d/kube-proxy
     mode: "777"
@@ -170,17 +170,21 @@ files:
       users:
       - name: kube-proxy
         user:
-          client-certificate: /etc/srv/kubernetes/pki/worker.crt
-          client-key: /etc/srv/kubernetes/pki/worker.key
+          client-certificate: /etc/srv/kubernetes/pki/proxy.crt
+          client-key: /etc/srv/kubernetes/pki/proxy.key
 
   - path: etc/srv/kubernetes/pki/ca-certificates.crt
     source: secrets/ca.crt
   - path: etc/srv/kubernetes/pki/ca-certificates.key
     source: secrets/ca.key
-  - path: etc/srv/kubernetes/pki/worker.crt
-    source: secrets/worker.crt
-  - path: etc/srv/kubernetes/pki/worker.key
-    source: secrets/worker.key
+  - path: etc/srv/kubernetes/pki/worker-node3.crt
+    source: secrets/worker-node3.crt
+  - path: etc/srv/kubernetes/pki/worker-node3.key
+    source: secrets/worker-node3.key
+  - path: etc/srv/kubernetes/pki/proxy.crt
+    source: secrets/proxy.crt
+  - path: etc/srv/kubernetes/pki/proxy.key
+    source: secrets/proxy.key
   - path: etc/runlevels/default/dockerd
     symlink: "/etc/init.d/dockerd"
   - path: etc/runlevels/default/kubelet
