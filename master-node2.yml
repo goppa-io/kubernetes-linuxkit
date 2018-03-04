@@ -92,7 +92,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/etcd
-      command_args="--name master-node2 --discovery-srv goppa-internal.io --initial-advertise-peer-urls http://master-node2.goppa-internal.io:2380 --initial-cluster-token etcd-cluster-1 --initial-cluster-state new --advertise-client-urls http://master-node2.goppa-internal.io:2379 --listen-client-urls http://0.0.0.0:2379 --listen-peer-urls http://0.0.0.0:2380"
+      command_args="--name master-node1 --discovery-srv goppa-internal.io --initial-advertise-peer-urls http://master-node2.goppa-internal.io:2380 --initial-cluster-token etcd-cluster-1 --initial-cluster-state new --advertise-client-urls http://master-node2.goppa-internal.io:2379 --listen-client-urls http://0.0.0.0:2379 --listen-peer-urls http://0.0.0.0:2380"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/etcd/${RC_SVCNAME}.log --stderr /var/log/etcd/${RC_SVCNAME}.log"
 
@@ -119,7 +119,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/kubelet
-      command_args="--allow-privileged=true --cgroup-root=/ --cluster-dns=10.11.12.254 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=cni --node-labels=kubernetes.io/role=master --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/"
+      command_args="--allow-privileged=true --anonymous-auth=false --authorization-mode=Webhook --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --cgroup-root=/ --cluster-dns=10.11.12.254 --cluster-domain=cluster.local --enable-debugging-handlers=true --eviction-hard='memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5%,imagefs.available<10%,imagefs.inodesFree<5%' --kubeconfig=/var/lib/kubelet/kubeconfig --network-plugin-mtu=9001 --network-plugin=cni --node-labels=kubernetes.io/role=master --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 --v=2 --cni-bin-dir=/opt/cni/bin/ --cni-conf-dir=/etc/cni/net.d/ --tls-cert-file=/etc/srv/kubernetes/pki/master-node2.crt --tls-private-key-file=/etc/srv/kubernetes/pki/master-node2.key"
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kubelet/${RC_SVCNAME}.log --stderr /var/log/kubelet/${RC_SVCNAME}.log"
      
@@ -154,8 +154,8 @@ files:
       users:
       - name: kubelet
         user:
-          client-certificate: /etc/srv/kubernetes/pki/apiserver.crt 
-          client-key: /etc/srv/kubernetes/pki/apiserver.key
+          client-certificate: /etc/srv/kubernetes/pki/master-node2.crt
+          client-key: /etc/srv/kubernetes/pki/master-node2.key
 
   - path: etc/init.d/kube-apiserver
     mode: "777"
@@ -168,7 +168,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/kube-apiserver
-      command_args="--insecure-bind-address=127.0.0.1 --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,ResourceQuota,PersistentVolumeLabel --allow-privileged=true --anonymous-auth=false --apiserver-count=3 --basic-auth-file=/etc/srv/kubernetes/basic_auth.csv --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --etcd-servers=http://etcd.goppa-internal.io:2379 --insecure-port=8080 --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP --secure-port=443 --service-cluster-ip-range=10.11.12.0/24 --storage-backend=etcd3 --tls-cert-file=/etc/srv/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --token-auth-file=/etc/srv/kubernetes/known_tokens.csv --authorization-mode=AlwaysAllow --v=2" 
+      command_args="--insecure-bind-address=127.0.0.1 --admission-control=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota --allow-privileged=true --anonymous-auth=false --apiserver-count=3 --authorization-mode=Node,RBAC --kubelet-certificate-authority=/etc/src/kubernetes/pki/ca-certificates.crt --kubelet-client-certificate=/var/lib/kubernetes/apiserver.crt --kubelet-client-key=/var/lib/kubernetes/apiserver.key --kubelet-https=true --basic-auth-file=/etc/srv/kubernetes/basic_auth.csv --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --etcd-servers=http://etcd.goppa-internal.io:2379 --insecure-port=8080 --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP --secure-port=443 --service-cluster-ip-range=10.11.12.0/24 --storage-backend=etcd3 --tls-cert-file=/etc/srv/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --token-auth-file=/etc/srv/kubernetes/known_tokens.csv --authorization-mode=AlwaysAllow --v=2" 
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kube-apiserver/${RC_SVCNAME}.log --stderr /var/log/kube-apiserver/${RC_SVCNAME}.log"
 
@@ -224,8 +224,8 @@ files:
       users:
       - name: kube-controller-manager
         user:
-          client-certificate: /etc/srv/kubernetes/pki/apiserver.crt
-          client-key: /etc/srv/kubernetes/pki/apiserver.key
+          client-certificate: /etc/srv/kubernetes/pki/controller.crt
+          client-key: /etc/srv/kubernetes/pki/controller.key
 
 
   - path: etc/init.d/kube-scheduler
@@ -269,8 +269,8 @@ files:
       users: 
       - name: kube-scheduler
         user:
-          client-certificate: /etc/srv/kubernetes/pki/apiserver.crt
-          client-key: /etc/srv/kubernetes/pki/apiserver.key
+          client-certificate: /etc/srv/kubernetes/pki/scheduler.crt
+          client-key: /etc/srv/kubernetes/pki/scheduler.key
 
   - path: etc/init.d/kube-proxy
     mode: "777"
@@ -313,17 +313,33 @@ files:
       users:
       - name: kube-proxy
         user:
-          client-certificate: /etc/srv/kubernetes/pki/apiserver.crt
-          client-key: /etc/srv/kubernetes/pki/apiserver.key
+          client-certificate: /etc/srv/kubernetes/pki/proxy.crt
+          client-key: /etc/srv/kubernetes/pki/proxy.key
 
   - path: etc/srv/kubernetes/pki/ca-certificates.crt
     source: secrets/ca.crt
   - path: etc/srv/kubernetes/pki/ca-certificates.key
     source: secrets/ca.key
+  - path: etc/srv/kubernetes/pki/master-node2.crt
+    source: secrets/master-node2.crt
+  - path: etc/srv/kubernetes/pki/master-node2.key
+    source: secrets/master-node2.key
   - path: etc/srv/kubernetes/pki/apiserver.crt
     source: secrets/apiserver.crt
   - path: etc/srv/kubernetes/pki/apiserver.key
     source: secrets/apiserver.key
+  - path: etc/srv/kubernetes/pki/controller.crt
+    source: secrets/controller.crt
+  - path: etc/srv/kubernetes/pki/controller.key
+    source: secrets/controller.key
+  - path: etc/srv/kubernetes/pki/scheduler.crt
+    source: secrets/scheduler.crt
+  - path: etc/srv/kubernetes/pki/scheduler.key
+    source: secrets/scheduler.key
+  - path: etc/srv/kubernetes/pki/proxy.crt
+    source: secrets/proxy.crt
+  - path: etc/srv/kubernetes/pki/proxy.key
+    source: secrets/proxy.key
   - path: etc/srv/kubernetes/basic_auth.csv
     source: secrets/basic_auth.csv
   - path: etc/srv/kubernetes/known_tokens.csv
