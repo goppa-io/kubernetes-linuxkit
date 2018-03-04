@@ -16,7 +16,7 @@ resource "tls_cert_request" "master_kubelet_csr" {
   key_algorithm = "${ element( tls_private_key.master_kubelet_key.*.algorithm, count.index )}"
   private_key_pem = "${ element( tls_private_key.master_kubelet_key.*.private_key_pem, count.index )}"
   subject {
-    common_name = "${var.tls_master_kubelet_cert_subject_common_name}${ count.index + 1}"
+    common_name = "${var.tls_master_kubelet_cert_subject_common_name}${ count.index + 1}.goppa-internal.io"
     locality = "${var.tls_kubelet_cert_subject_locality}"
     organization = "${var.tls_kubelet_cert_subject_organization}"
     organizational_unit = "${var.tls_kubelet_cert_subject_organization_unit}"
@@ -38,7 +38,7 @@ resource "tls_cert_request" "worker_kubelet_csr" {
   key_algorithm = "${ element( tls_private_key.worker_kubelet_key.*.algorithm, count.index )}"
   private_key_pem = "${ element( tls_private_key.worker_kubelet_key.*.private_key_pem, count.index )}"
   subject {
-    common_name = "${var.tls_worker_kubelet_cert_subject_common_name}${ count.index + 1}"
+    common_name = "${var.tls_worker_kubelet_cert_subject_common_name}${ count.index + 1}.goppa-internal.io"
     locality = "${var.tls_kubelet_cert_subject_locality}"
     organization = "${var.tls_kubelet_cert_subject_organization}"
     organizational_unit = "${var.tls_kubelet_cert_subject_organization_unit}"
