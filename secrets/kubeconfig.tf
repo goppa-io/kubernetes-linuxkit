@@ -5,7 +5,7 @@ data "template_file" "kubelet_kubeconfig" {
     cluster_name = "cluster-goppa-internal"
     cluster_user = "admin-cluster-goppa-internal"
     cluster = "goppa-internal"
-    cluster_auth = "client-certificate-data: ${ base64encode(tls_locally_signed_cert.client_cert.cert_pem) } \n    client-key-data: ${ base64encode(tls_private_key.client_key.private_key_pem) }"
+    cluster_auth = "client-certificate-data: ${ base64encode(tls_locally_signed_cert.admin_cert.cert_pem) } \n    client-key-data: ${ base64encode(tls_private_key.admin_key.private_key_pem) }"
 
   }
 }
