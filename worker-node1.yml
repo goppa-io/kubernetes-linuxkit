@@ -10,7 +10,7 @@ init:
   - iidlx/kubernetes-worker:b4090a8b48515844b409d0dfc9a4dccc28c9078a
   - iidlx/cni:faaa05f98a9b208b1d1174e28a5dd3fd6d9688d1
   - iidlx/socat:a5274d356e74782386222a7b8906951dc32e8b98
-  - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
+  - linuxkit/ca-certificates:0a188e40108b6ece8c2aefdfaaad94acc84368ce-amd64
   - linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
 files:
   - path: /init
