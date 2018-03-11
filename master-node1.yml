@@ -11,7 +11,7 @@ init:
   - iidlx/etcd3:dc482d467e1d89b32bf5ad304064df674feffb73
   - iidlx/cni:faaa05f98a9b208b1d1174e28a5dd3fd6d9688d1
   - iidlx/socat:a5274d356e74782386222a7b8906951dc32e8b98
-  - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
+  - linuxkit/ca-certificates:0a188e40108b6ece8c2aefdfaaad94acc84368ce-amd64
   - linuxkit/firmware:8fc7d7702589b67e5b1aa72bb61cc72b47a048aa
 files:
   - path: /init
@@ -168,7 +168,7 @@ files:
       #supervisor=start-stop-daemon
 
       command=/usr/bin/kube-apiserver
-      command_args="--insecure-bind-address=127.0.0.1 --admission-control=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota --allow-privileged=true --anonymous-auth=false --apiserver-count=3 --authorization-mode=Node,RBAC --kubelet-certificate-authority=/etc/srv/kubernetes/pki/ca-certificates.crt --kubelet-client-certificate=/etc/srv/kubernetes/pki/apiserver.crt --kubelet-client-key=/etc/srv/kubernetes/pki/apiserver.key --kubelet-https=true --basic-auth-file=/etc/srv/kubernetes/basic_auth.csv --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --etcd-servers=http://etcd.goppa-internal.io:2379 --insecure-port=8080 --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP --secure-port=443 --service-cluster-ip-range=10.11.12.0/24 --storage-backend=etcd3 --tls-cert-file=/etc/srv/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --token-auth-file=/etc/srv/kubernetes/known_tokens.csv --authorization-mode=AlwaysAllow --v=2" 
+      command_args="--insecure-bind-address=127.0.0.1 --admission-control=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota --allow-privileged=true --anonymous-auth=false --apiserver-count=3 --authorization-mode=Node,RBAC --kubelet-certificate-authority=/etc/srv/kubernetes/pki/ca-certificates.crt --kubelet-client-certificate=/etc/srv/kubernetes/pki/apiserver.crt --kubelet-client-key=/etc/srv/kubernetes/pki/apiserver.key --kubelet-https=true --basic-auth-file=/etc/srv/kubernetes/basic_auth.csv --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --etcd-servers=http://etcd.goppa-internal.io:2379 --insecure-port=8080 --kubelet-preferred-address-types=Hostname --secure-port=443 --service-cluster-ip-range=10.11.12.0/24 --storage-backend=etcd3 --tls-cert-file=/etc/srv/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/srv/kubernetes/pki/apiserver.key --token-auth-file=/etc/srv/kubernetes/known_tokens.csv --authorization-mode=AlwaysAllow --v=2" 
       command_background="true"
       start_stop_daemon_args="--stdout /var/log/kube-apiserver/${RC_SVCNAME}.log --stderr /var/log/kube-apiserver/${RC_SVCNAME}.log"
 
