@@ -37,7 +37,6 @@ find_running_ifaces() {
 }
 
 start() {
-        rm -rf /etc/resolv.conf
 	local iface= ret=1
 	ebegin "Starting networking"
 	eindent
