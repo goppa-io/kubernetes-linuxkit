@@ -71,17 +71,18 @@ routes() {
 }
 
 resolvconf() {
-	local i
-	[ -n "$IF_PEER_DNS" ] && [ "$IF_PEER_DNS" != "yes" ] && return
-	if [ "$RESOLV_CONF" = "no" ] || [ "$RESOLV_CONF" = "NO" ] \
-			|| [ -z "$RESOLV_CONF" ]; then
-		return
-	fi
-	echo -n > "$RESOLV_CONF"
-	[ -n "$domain" ] && echo "search $domain" >> "$RESOLV_CONF"
-	for i in $dns; do
-		echo "nameserver $i" >> "$RESOLV_CONF"
-	done
+#	local i
+#	[ -n "$IF_PEER_DNS" ] && [ "$IF_PEER_DNS" != "yes" ] && return
+#	if [ "$RESOLV_CONF" = "no" ] || [ "$RESOLV_CONF" = "NO" ] \
+#			|| [ -z "$RESOLV_CONF" ]; then
+#		return
+#	fi
+#	echo -n > "$RESOLV_CONF"
+#	[ -n "$domain" ] && echo "search $domain" >> "$RESOLV_CONF"
+#	for i in $dns; do
+#		echo "nameserver $i" >> "$RESOLV_CONF"
+#	done
+        echo "skipping dns"
 }
 
 bound() {
