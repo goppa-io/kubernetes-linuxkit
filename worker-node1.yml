@@ -2,7 +2,7 @@ kernel:
   image: linuxkit/kernel:4.9.78
   cmdline: "console=ttyS1 rootfstype=tmpfs"
 init:
-  - iidlx/openrc:3f347f376552a78462a13aa898e01743ede4bde4
+  - iidlx/openrc:cca39dbf4128f109c3afedbc130d72e3ba3643ab
   - iidlx/metadata:7bf10bcc7fb22ced0f5d8c4cee3a4b2064357c51
   - iidlx/containerd:dd71f4fc21d5784eb04b12cd54b10b2df164964e-dirty
   - iidlx/runc:8f2312eb99a074e4f9f9931457d7f13a4399ad8b
@@ -54,7 +54,9 @@ files:
     contents: |
       auto eth0
       iface eth0 inet dhcp
-              post-up echo 'nameserver 147.75.94.157' > /etc/resolv.conf
+  - path: etc/resolv.conf
+    contents: |
+      nameserver 147.75.94.157
   - path: etc/hostname
     contents: |
       worker-node1.goppa-internal.io
