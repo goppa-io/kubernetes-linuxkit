@@ -10,8 +10,8 @@ RESOLV_CONF="/etc/resolv.conf"
 [ -f $UDHCPC_CONF ] && . $UDHCPC_CONF
 
 export broadcast
-export dns
-export domain
+#export dns
+#export domain
 export interface
 export ip
 export mask
