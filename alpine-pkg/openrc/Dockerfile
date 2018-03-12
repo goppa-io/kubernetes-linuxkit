@@ -4,7 +4,8 @@ RUN mkdir -p /out/etc/apk && cp -r /etc/apk/* /out/etc/apk/
 RUN apk add --no-cache --initdb -p /out \
 busybox \
 openrc \
-util-linux 
+util-linux \
+linux-pam 
 RUN mv /out/etc/apk/repositories.upstream /out/etc/apk/repositories
 
 # Use sha256 here to get a fixed version
