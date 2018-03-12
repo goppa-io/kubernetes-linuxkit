@@ -1,3 +1,1 @@
-rc_ulimit="-p unlimited -n 1048576 -c unlimited"
-#rc_ulimit="-n 1048576"
-#rc_ulimit="-c unlimited"
+rc_ulimit="-p unlimited, -n 1048576, -c unlimited"
