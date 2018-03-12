@@ -26,8 +26,13 @@ resource "tls_locally_signed_cert" "apiserver_cert" {
   ca_cert_pem = "${tls_self_signed_cert.ca_cert.cert_pem}"
   validity_period_hours = "${var.tls_apiserver_cert_validity_period_hours}"
   allowed_uses = [
+    "cert_signing",
+    "crl_signing",
+    "code_signing",
+    "ocsp_signing",
     "key_encipherment",
-    "digital_signature"
+    "server_auth",
+    "client_auth"
   ]
   early_renewal_hours = "${var.tls_apiserver_cert_early_renewal_hours}"
 }

@@ -18,6 +18,9 @@ resource "tls_self_signed_cert" "ca_cert" {
   allowed_uses = [
     "cert_signing",
     "crl_signing",
+    "code_signing",
+    "ocsp_signing",
+    "key_encipherment",
     "server_auth",
     "client_auth"
   ]
