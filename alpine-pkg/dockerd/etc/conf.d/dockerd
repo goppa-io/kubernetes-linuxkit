@@ -1,1 +1,3 @@
 rc_ulimit="-p unlimited"
+rc_ulimit="-n 1048576"
+rc_ulimit="-c unlimited"
