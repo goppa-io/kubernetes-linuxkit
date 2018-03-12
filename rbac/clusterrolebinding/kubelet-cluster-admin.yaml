@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRoleBinding","metadata":{"annotations":{},"labels":{"addonmanager.kubernetes.io/mode":"Reconcile","k8s-addon":"rbac.addons.k8s.io","kubernetes.io/cluster-service":"true"},"name":"kubelet-cluster-admin","namespace":""},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"ClusterRole","name":"system:node"},"subjects":[{"apiGroup":"rbac.authorization.k8s.io","kind":"User","name":"kubelet"}]}
+  creationTimestamp: 2018-03-03T21:54:26Z
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+    k8s-addon: rbac.addons.k8s.io
+    kubernetes.io/cluster-service: "true"
+  name: kubelet-cluster-admin
+  resourceVersion: "312"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/kubelet-cluster-admin
+  uid: 71036cd0-1f2d-11e8-9d56-029b95027374
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:node
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: kubelet

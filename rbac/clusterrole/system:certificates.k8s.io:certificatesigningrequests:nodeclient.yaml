@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  creationTimestamp: 2018-03-03T21:53:42Z
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:certificates.k8s.io:certificatesigningrequests:nodeclient
+  resourceVersion: "57"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterroles/system%3Acertificates.k8s.io%3Acertificatesigningrequests%3Anodeclient
+  uid: 56e7daa2-1f2d-11e8-9d56-029b95027374
+rules:
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests/nodeclient
+  verbs:
+  - create

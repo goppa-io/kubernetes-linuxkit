@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"ClusterRoleBinding","metadata":{"annotations":{},"labels":{"k8s-addon":"kube-dns.addons.k8s.io"},"name":"kube-dns-autoscaler","namespace":""},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"ClusterRole","name":"kube-dns-autoscaler"},"subjects":[{"kind":"ServiceAccount","name":"kube-dns-autoscaler","namespace":"kube-system"}]}
+  creationTimestamp: 2018-03-03T21:54:25Z
+  labels:
+    k8s-addon: kube-dns.addons.k8s.io
+  name: kube-dns-autoscaler
+  resourceVersion: "301"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/kube-dns-autoscaler
+  uid: 7081970c-1f2d-11e8-9d56-029b95027374
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kube-dns-autoscaler
+subjects:
+- kind: ServiceAccount
+  name: kube-dns-autoscaler
+  namespace: kube-system

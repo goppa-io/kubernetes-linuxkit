@@ -1,0 +1,42 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"ClusterRole","metadata":{"annotations":{},"labels":{"k8s-addon":"kube-dns.addons.k8s.io"},"name":"kube-dns-autoscaler","namespace":""},"rules":[{"apiGroups":[""],"resources":["nodes"],"verbs":["list"]},{"apiGroups":[""],"resources":["replicationcontrollers/scale"],"verbs":["get","update"]},{"apiGroups":["extensions"],"resources":["deployments/scale","replicasets/scale"],"verbs":["get","update"]},{"apiGroups":[""],"resources":["configmaps"],"verbs":["get","create"]}]}
+  creationTimestamp: 2018-03-03T21:54:25Z
+  labels:
+    k8s-addon: kube-dns.addons.k8s.io
+  name: kube-dns-autoscaler
+  resourceVersion: "298"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterroles/kube-dns-autoscaler
+  uid: 7077ddfa-1f2d-11e8-9d56-029b95027374
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - replicationcontrollers/scale
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - extensions
+  resources:
+  - deployments/scale
+  - replicasets/scale
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - create

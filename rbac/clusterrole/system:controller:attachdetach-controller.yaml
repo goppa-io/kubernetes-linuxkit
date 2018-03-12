@@ -1,0 +1,51 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  creationTimestamp: 2018-03-03T21:53:42Z
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:controller:attachdetach-controller
+  resourceVersion: "59"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterroles/system%3Acontroller%3Aattachdetach-controller
+  uid: 56ea70e7-1f2d-11e8-9d56-029b95027374
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  - persistentvolumes
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes/status
+  verbs:
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update

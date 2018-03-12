@@ -1,0 +1,20 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  creationTimestamp: 2018-03-03T21:53:43Z
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:controller:daemon-set-controller
+  resourceVersion: "94"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/system%3Acontroller%3Adaemon-set-controller
+  uid: 571dd4d3-1f2d-11e8-9d56-029b95027374
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:controller:daemon-set-controller
+subjects:
+- kind: ServiceAccount
+  name: daemon-set-controller
+  namespace: kube-system
