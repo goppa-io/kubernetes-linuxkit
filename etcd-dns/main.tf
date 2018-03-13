@@ -3,7 +3,7 @@ provider "packet" {
 }
 
 data "template_file" "custom_ipxe_master" {
-  count = "2"
+  count = "3"
   template = "${ file( "${ path.module }/custom_ipxe.yml" )}"
   vars {
     image = "${ var.master_image }${ count.index + 1}"
@@ -11,7 +11,7 @@ data "template_file" "custom_ipxe_master" {
 }
 
 data "template_file" "custom_ipxe_worker" {
-  count = "2"
+  count = "3"
   template = "${ file( "${ path.module }/custom_ipxe.yml" )}"
   vars {
     image = "${ var.worker_image }${ count.index + 1}"
@@ -19,7 +19,7 @@ data "template_file" "custom_ipxe_worker" {
 }
 
 resource "packet_device" "infra" {
-  count            = "2"
+  count            = "3"
   hostname         = "master-node${ count.index + 1 }"
   plan             = "baremetal_2"
   facility         = "ewr1"
@@ -31,7 +31,7 @@ resource "packet_device" "infra" {
 }
 
 resource "packet_device" "worker" {
-  count            = "2"
+  count            = "3"
   hostname         = "worker-node${ count.index + 1 }"
   plan             = "baremetal_2"
   facility         = "ewr1"
@@ -45,7 +45,7 @@ resource "packet_device" "worker" {
 
 
 resource "null_resource" "etcd" {
-  count = "2"
+  count = "3"
 
   provisioner "local-exec" {
     when = "create"
