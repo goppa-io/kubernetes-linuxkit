@@ -180,9 +180,9 @@ files:
   - path: etc/srv/kubernetes/pki/ca-certificates.key
     source: secrets/ca.key
   - path: etc/srv/kubernetes/pki/worker-node3.crt
-    source: secrets/worker-node1.crt
+    source: secrets/worker-node3.crt
   - path: etc/srv/kubernetes/pki/worker-node3.key
-    source: secrets/worker-node1.key
+    source: secrets/worker-node3.key
   - path: etc/srv/kubernetes/pki/proxy.crt
     source: secrets/proxy.crt
   - path: etc/srv/kubernetes/pki/proxy.key
